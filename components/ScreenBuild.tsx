@@ -120,6 +120,43 @@ export default function ScreenBuild({
 
   const pickPlayer = (tid: number, name: string, pos: Position) => {
     if (pickerIdx === null) return;
+
+    // No modo de continuação do campeonato, troca jogadores entre os já escalados
+    if (isContinuing) {
+      const fromLineupIdx = lineup.findIndex(
+        (s) => s.player?.n === name && s.player?.tid === tid
+      );
+      const fromBenchIdx = bench.findIndex(
+        (p) => p?.n === name && p?.tid === tid
+      );
+      const currentPlayer = lineup[pickerIdx].player;
+
+      if (fromLineupIdx >= 0 && fromLineupIdx !== pickerIdx) {
+        // Troca dois slots do lineup entre si
+        const newLineup = lineup.map((s, i) => {
+          if (i === pickerIdx) return { ...s, player: lineup[fromLineupIdx].player };
+          if (i === fromLineupIdx) return { ...s, player: currentPlayer };
+          return s;
+        });
+        onLineupChange(newLineup, teamUsage);
+      } else if (fromBenchIdx >= 0) {
+        // Troca slot do lineup com reserva
+        const benchPlayer = bench[fromBenchIdx];
+        const newLineup = lineup.map((s, i) =>
+          i === pickerIdx ? { ...s, player: benchPlayer } : s
+        );
+        const newBench = bench.map((p, i) =>
+          i === fromBenchIdx ? currentPlayer : p
+        );
+        onLineupChange(newLineup, teamUsage);
+        onBenchChange(newBench);
+      }
+
+      setPickerIdx(null);
+      return;
+    }
+
+    // Modo normal: seleciona qualquer jogador dos times
     const usage = { ...teamUsage };
     const slot = lineup[pickerIdx];
     if (slot.player) {
@@ -394,6 +431,8 @@ export default function ScreenBuild({
           slotIdx={pickerIdx}
           lineup={lineup}
           teamUsage={combinedUsage}
+          swapMode={isContinuing}
+          bench={isContinuing ? bench : undefined}
           onPick={pickPlayer}
           onRemove={removeSlot}
           onClose={() => setPickerIdx(null)}
