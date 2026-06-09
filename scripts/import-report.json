@@ -1,0 +1,1616 @@
+{
+  "matched": [
+    {
+      "team": "PAL",
+      "gameName": "Carlos Miguel",
+      "tmName": "Carlos Miguel",
+      "id": "641458",
+      "file": "641458.jpg"
+    },
+    {
+      "team": "PAL",
+      "gameName": "Marcelo Lomba",
+      "tmName": "Marcelo Lomba",
+      "id": "53015",
+      "file": "53015.jpg"
+    },
+    {
+      "team": "PAL",
+      "gameName": "Gustavo Gómez",
+      "tmName": "Gustavo Gómez",
+      "id": "215390",
+      "file": "215390.jpg"
+    },
+    {
+      "team": "PAL",
+      "gameName": "Murilo",
+      "tmName": "Murilo",
+      "id": "458710",
+      "file": "458710.png"
+    },
+    {
+      "team": "PAL",
+      "gameName": "Bruno Fuchs",
+      "tmName": "Bruno Fuchs",
+      "id": "563692",
+      "file": "563692.png"
+    },
+    {
+      "team": "PAL",
+      "gameName": "Agustín Giay",
+      "tmName": "Agustín Giay",
+      "id": "849582",
+      "file": "849582.jpg"
+    },
+    {
+      "team": "PAL",
+      "gameName": "Piquerez",
+      "tmName": "Joaquín Piquerez",
+      "id": "496268",
+      "file": "496268.jpg"
+    },
+    {
+      "team": "PAL",
+      "gameName": "Jefté",
+      "tmName": "Jefté",
+      "id": "851595",
+      "file": "851595.jpg"
+    },
+    {
+      "team": "PAL",
+      "gameName": "Andreas Pereira",
+      "tmName": "Andreas Pereira",
+      "id": "203394",
+      "file": "203394.jpg"
+    },
+    {
+      "team": "PAL",
+      "gameName": "Felipe Anderson",
+      "tmName": "Felipe Anderson",
+      "id": "159372",
+      "file": "159372.jpg"
+    },
+    {
+      "team": "PAL",
+      "gameName": "Marlon Freitas",
+      "tmName": "Marlon Freitas",
+      "id": "364972",
+      "file": "364972.jpg"
+    },
+    {
+      "team": "PAL",
+      "gameName": "Jhon Arias",
+      "tmName": "Jhon Arias",
+      "id": "588989",
+      "file": "588989.jpg"
+    },
+    {
+      "team": "PAL",
+      "gameName": "Lucas Evangelista",
+      "tmName": "Lucas Evangelista",
+      "id": "270188",
+      "file": "270188.png"
+    },
+    {
+      "team": "PAL",
+      "gameName": "Emiliano Martínez",
+      "tmName": "Emiliano Martínez",
+      "id": "707447",
+      "file": "707447.jpg"
+    },
+    {
+      "team": "PAL",
+      "gameName": "José Manuel López",
+      "tmName": "José Manuel López",
+      "id": "844797",
+      "file": "844797.jpg"
+    },
+    {
+      "team": "PAL",
+      "gameName": "Vitor Roque",
+      "tmName": "Vitor Roque",
+      "id": "943837",
+      "file": "943837.jpg"
+    },
+    {
+      "team": "PAL",
+      "gameName": "Paulinho",
+      "tmName": "Paulinho",
+      "id": "428791",
+      "file": "428791.jpg"
+    },
+    {
+      "team": "PAL",
+      "gameName": "Ramón Sosa",
+      "tmName": "Ramón Sosa",
+      "id": "745191",
+      "file": "745191.jpg"
+    },
+    {
+      "team": "PAL",
+      "gameName": "Luighi",
+      "tmName": "Luighi",
+      "id": "1158001",
+      "file": "1158001.jpg"
+    },
+    {
+      "team": "FLA",
+      "gameName": "Agustín Rossi",
+      "tmName": "Agustín Rossi",
+      "id": "352324",
+      "file": "352324.jpg"
+    },
+    {
+      "team": "FLA",
+      "gameName": "Andrew",
+      "tmName": "Andrew",
+      "id": "610417",
+      "file": "610417.jpg"
+    },
+    {
+      "team": "FLA",
+      "gameName": "Léo Pereira",
+      "tmName": "Léo Pereira",
+      "id": "288431",
+      "file": "288431.jpg"
+    },
+    {
+      "team": "FLA",
+      "gameName": "Léo Ortiz",
+      "tmName": "Léo Ortiz",
+      "id": "374136",
+      "file": "374136.jpg"
+    },
+    {
+      "team": "FLA",
+      "gameName": "Vitão",
+      "tmName": "Vitão",
+      "id": "428783",
+      "file": "428783.png"
+    },
+    {
+      "team": "FLA",
+      "gameName": "Guillermo Varela",
+      "tmName": "Guillermo Varela",
+      "id": "188862",
+      "file": "188862.jpg"
+    },
+    {
+      "team": "FLA",
+      "gameName": "Ayrton Lucas",
+      "tmName": "Ayrton Lucas",
+      "id": "349585",
+      "file": "349585.jpg"
+    },
+    {
+      "team": "FLA",
+      "gameName": "Alex Sandro",
+      "tmName": "Alex Sandro",
+      "id": "79960",
+      "file": "79960.jpg"
+    },
+    {
+      "team": "FLA",
+      "gameName": "Emerson Royal",
+      "tmName": "Emerson Royal",
+      "id": "476344",
+      "file": "476344.jpg"
+    },
+    {
+      "team": "FLA",
+      "gameName": "Giorgian de Arrascaeta",
+      "tmName": "Giorgian de Arrascaeta",
+      "id": "248410",
+      "file": "248410.jpg"
+    },
+    {
+      "team": "FLA",
+      "gameName": "Jorginho",
+      "tmName": "Jorginho",
+      "id": "102017",
+      "file": "102017.jpg"
+    },
+    {
+      "team": "FLA",
+      "gameName": "Erick Pulgar",
+      "tmName": "Erick Pulgar",
+      "id": "215616",
+      "file": "215616.jpg"
+    },
+    {
+      "team": "FLA",
+      "gameName": "Lucas Paquetá",
+      "tmName": "Lucas Paquetá",
+      "id": "444523",
+      "file": "444523.jpg"
+    },
+    {
+      "team": "FLA",
+      "gameName": "Jorge Carrascal",
+      "tmName": "Jorge Carrascal",
+      "id": "354145",
+      "file": "354145.jpg"
+    },
+    {
+      "team": "FLA",
+      "gameName": "Pedro",
+      "tmName": "Pedro",
+      "id": "432895",
+      "file": "432895.jpg"
+    },
+    {
+      "team": "FLA",
+      "gameName": "Samuel Lino",
+      "tmName": "Samuel Lino",
+      "id": "694928",
+      "file": "694928.jpg"
+    },
+    {
+      "team": "FLA",
+      "gameName": "Luiz Araújo",
+      "tmName": "Luiz Araújo",
+      "id": "435485",
+      "file": "435485.jpg"
+    },
+    {
+      "team": "FLA",
+      "gameName": "Everton",
+      "tmName": "Everton",
+      "id": "321239",
+      "file": "321239.jpg"
+    },
+    {
+      "team": "FLA",
+      "gameName": "Gonzalo Plata",
+      "tmName": "Gonzalo Plata",
+      "id": "592735",
+      "file": "592735.jpg"
+    },
+    {
+      "team": "FLU",
+      "gameName": "Fábio",
+      "tmName": "Fábio",
+      "id": "22415",
+      "file": "22415.jpg"
+    },
+    {
+      "team": "FLU",
+      "gameName": "Vitor Eudes",
+      "tmName": "Vitor Eudes",
+      "id": "590039",
+      "file": "590039.jpg"
+    },
+    {
+      "team": "FLU",
+      "gameName": "Guilherme Arana",
+      "tmName": "Guilherme Arana",
+      "id": "346766",
+      "file": "346766.jpg"
+    },
+    {
+      "team": "FLU",
+      "gameName": "Ignácio",
+      "tmName": "Ignácio",
+      "id": "624291",
+      "file": "624291.jpg"
+    },
+    {
+      "team": "FLU",
+      "gameName": "Samuel Xavier",
+      "tmName": "Samuel Xavier",
+      "id": "198250",
+      "file": "198250.jpg"
+    },
+    {
+      "team": "FLU",
+      "gameName": "Martinelli",
+      "tmName": "Martinelli",
+      "id": "815558",
+      "file": "815558.jpg"
+    },
+    {
+      "team": "FLU",
+      "gameName": "Nonato",
+      "tmName": "Nonato",
+      "id": "546172",
+      "file": "546172.jpg"
+    },
+    {
+      "team": "FLU",
+      "gameName": "Luciano Acosta",
+      "tmName": "Luciano Acosta",
+      "id": "315169",
+      "file": "315169.jpg"
+    },
+    {
+      "team": "FLU",
+      "gameName": "Ganso",
+      "tmName": "Ganso",
+      "id": "67920",
+      "file": "67920.jpg"
+    },
+    {
+      "team": "FLU",
+      "gameName": "Agustín Canobbio",
+      "tmName": "Agustín Canobbio",
+      "id": "457533",
+      "file": "457533.jpg"
+    },
+    {
+      "team": "FLU",
+      "gameName": "Jefferson Savarino",
+      "tmName": "Jefferson Savarino",
+      "id": "309193",
+      "file": "309193.jpg"
+    },
+    {
+      "team": "FLU",
+      "gameName": "Cano",
+      "tmName": "Germán Cano",
+      "id": "54590",
+      "file": "54590.jpg"
+    },
+    {
+      "team": "FLU",
+      "gameName": "John Kennedy",
+      "tmName": "John Kennedy",
+      "id": "856085",
+      "file": "856085.jpg"
+    },
+    {
+      "team": "FLU",
+      "gameName": "Kevin Serna",
+      "tmName": "Kevin Serna",
+      "id": "745927",
+      "file": "745927.jpg"
+    },
+    {
+      "team": "CAP",
+      "gameName": "Mycael",
+      "tmName": "Mycael",
+      "id": "743586",
+      "file": "743586.jpg"
+    },
+    {
+      "team": "CAP",
+      "gameName": "Esquivel",
+      "tmName": "Lucas Esquivel",
+      "id": "829969",
+      "file": "829969.jpg"
+    },
+    {
+      "team": "CAP",
+      "gameName": "Zapelli",
+      "tmName": "Bruno Zapelli",
+      "id": "711600",
+      "file": "711600.jpg"
+    },
+    {
+      "team": "CAP",
+      "gameName": "Kevin Viveros",
+      "tmName": "Kevin Viveros",
+      "id": "580461",
+      "file": "580461.jpg"
+    },
+    {
+      "team": "CAP",
+      "gameName": "Julimar",
+      "tmName": "Julimar",
+      "id": "593205",
+      "file": "593205.jpg"
+    },
+    {
+      "team": "RBB",
+      "gameName": "Cleiton",
+      "tmName": "Cleiton",
+      "id": "468247",
+      "file": "468247.jpg"
+    },
+    {
+      "team": "RBB",
+      "gameName": "Guzmán Rodríguez",
+      "tmName": "Guzmán Rodríguez",
+      "id": "732899",
+      "file": "732899.jpg"
+    },
+    {
+      "team": "RBB",
+      "gameName": "Andrés Hurtado",
+      "tmName": "José Andrés Hurtado",
+      "id": "680506",
+      "file": "680506.jpg"
+    },
+    {
+      "team": "RBB",
+      "gameName": "Eric Ramires",
+      "tmName": "Eric Ramires",
+      "id": "614328",
+      "file": "614328.jpg"
+    },
+    {
+      "team": "RBB",
+      "gameName": "Bruninho",
+      "tmName": "Bruninho",
+      "id": "668234",
+      "file": "668234.jpg"
+    },
+    {
+      "team": "BAH",
+      "gameName": "Gabriel Xavier",
+      "tmName": "Gabriel Xavier",
+      "id": "740501",
+      "file": "740501.jpg"
+    },
+    {
+      "team": "BAH",
+      "gameName": "Kanu",
+      "tmName": "Kanu",
+      "id": "524446",
+      "file": "524446.png"
+    },
+    {
+      "team": "BAH",
+      "gameName": "Gilberto",
+      "tmName": "Gilberto",
+      "id": "231614",
+      "file": "231614.jpg"
+    },
+    {
+      "team": "BAH",
+      "gameName": "Luciano Juba",
+      "tmName": "Luciano Juba",
+      "id": "676035",
+      "file": "676035.jpg"
+    },
+    {
+      "team": "BAH",
+      "gameName": "Éverton",
+      "tmName": "Everton Ribeiro",
+      "id": "52896",
+      "file": "52896.jpg"
+    },
+    {
+      "team": "BAH",
+      "gameName": "Jean Lucas",
+      "tmName": "Jean Lucas",
+      "id": "578872",
+      "file": "578872.jpg"
+    },
+    {
+      "team": "BAH",
+      "gameName": "Ademir",
+      "tmName": "Ademir",
+      "id": "544259",
+      "file": "544259.jpg"
+    },
+    {
+      "team": "CFC",
+      "gameName": "Willian Oliveira",
+      "tmName": "Willian Oliveira",
+      "id": "252900",
+      "file": "252900.jpg"
+    },
+    {
+      "team": "CAM",
+      "gameName": "Everson",
+      "tmName": "Everson",
+      "id": "106032",
+      "file": "106032.jpg"
+    },
+    {
+      "team": "CAM",
+      "gameName": "Lyanco",
+      "tmName": "Lyanco",
+      "id": "379807",
+      "file": "379807.jpg"
+    },
+    {
+      "team": "CAM",
+      "gameName": "Gustavo Scarpa",
+      "tmName": "Gustavo Scarpa",
+      "id": "330085",
+      "file": "330085.jpg"
+    },
+    {
+      "team": "CAM",
+      "gameName": "Reinier",
+      "tmName": "Reinier",
+      "id": "627226",
+      "file": "627226.jpg"
+    },
+    {
+      "team": "CAM",
+      "gameName": "Bernard",
+      "tmName": "Bernard",
+      "id": "175169",
+      "file": "175169.jpg"
+    },
+    {
+      "team": "CAM",
+      "gameName": "Hulk",
+      "tmName": "Hulk",
+      "id": "80562",
+      "file": "80562.jpg"
+    },
+    {
+      "team": "CAM",
+      "gameName": "Victor Hugo",
+      "tmName": "Victor Hugo",
+      "id": "749559",
+      "file": "749559.jpg"
+    },
+    {
+      "team": "CAM",
+      "gameName": "Mateo Cassierra",
+      "tmName": "Mateo Cassierra",
+      "id": "362667",
+      "file": "362667.png"
+    },
+    {
+      "team": "BOT",
+      "gameName": "Raul",
+      "tmName": "Raul",
+      "id": "520093",
+      "file": "520093.jpg"
+    },
+    {
+      "team": "BOT",
+      "gameName": "Neto",
+      "tmName": "Neto",
+      "id": "111819",
+      "file": "111819.jpg"
+    },
+    {
+      "team": "BOT",
+      "gameName": "Alex Telles",
+      "tmName": "Alex Telles",
+      "id": "255755",
+      "file": "255755.jpg"
+    },
+    {
+      "team": "BOT",
+      "gameName": "Bastos",
+      "tmName": "Bastos",
+      "id": "195810",
+      "file": "195810.png"
+    },
+    {
+      "team": "BOT",
+      "gameName": "Mateo Ponte",
+      "tmName": "Mateo Ponte",
+      "id": "856047",
+      "file": "856047.jpg"
+    },
+    {
+      "team": "BOT",
+      "gameName": "Vitinho",
+      "tmName": "Vitinho",
+      "id": "468249",
+      "file": "468249.jpg"
+    },
+    {
+      "team": "BOT",
+      "gameName": "Marçal",
+      "tmName": "Marçal",
+      "id": "137745",
+      "file": "137745.jpg"
+    },
+    {
+      "team": "BOT",
+      "gameName": "Danilo",
+      "tmName": "Danilo",
+      "id": "808509",
+      "file": "808509.jpg"
+    },
+    {
+      "team": "BOT",
+      "gameName": "Álvaro Montoro",
+      "tmName": "Álvaro Montoro",
+      "id": "1228194",
+      "file": "1228194.jpg"
+    },
+    {
+      "team": "BOT",
+      "gameName": "Santiago Rodríguez",
+      "tmName": "Santiago Rodríguez",
+      "id": "465819",
+      "file": "465819.jpg"
+    },
+    {
+      "team": "BOT",
+      "gameName": "Allan",
+      "tmName": "Allan",
+      "id": "126422",
+      "file": "126422.jpg"
+    },
+    {
+      "team": "BOT",
+      "gameName": "Edenilson",
+      "tmName": "Edenilson",
+      "id": "169052",
+      "file": "169052.jpg"
+    },
+    {
+      "team": "BOT",
+      "gameName": "Arthur Cabral",
+      "tmName": "Arthur Cabral",
+      "id": "390638",
+      "file": "390638.jpg"
+    },
+    {
+      "team": "BOT",
+      "gameName": "Chris Ramos",
+      "tmName": "Chris Ramos",
+      "id": "538810",
+      "file": "538810.jpg"
+    },
+    {
+      "team": "BOT",
+      "gameName": "Matheus Martins",
+      "tmName": "Matheus Martins",
+      "id": "668228",
+      "file": "668228.jpg"
+    },
+    {
+      "team": "BOT",
+      "gameName": "Joaquín Correa",
+      "tmName": "Joaquín Correa",
+      "id": "227081",
+      "file": "227081.jpg"
+    },
+    {
+      "team": "VIT",
+      "gameName": "Lucas Arcanjo",
+      "tmName": "Lucas Arcanjo",
+      "id": "645602",
+      "file": "645602.jpg"
+    },
+    {
+      "team": "VIT",
+      "gameName": "Camutanga",
+      "tmName": "Camutanga",
+      "id": "607817",
+      "file": "607817.jpg"
+    },
+    {
+      "team": "VIT",
+      "gameName": "Luan",
+      "tmName": "Luan Cândido",
+      "id": "432166",
+      "file": "432166.jpg"
+    },
+    {
+      "team": "VIT",
+      "gameName": "Osvaldo",
+      "tmName": "Osvaldo",
+      "id": "76191",
+      "file": "76191.jpg"
+    },
+    {
+      "team": "INT",
+      "gameName": "Rochet",
+      "tmName": "Sergio Rochet",
+      "id": "264014",
+      "file": "264014.jpg"
+    },
+    {
+      "team": "INT",
+      "gameName": "Anthoni",
+      "tmName": "Anthoni",
+      "id": "869437",
+      "file": "869437.jpg"
+    },
+    {
+      "team": "INT",
+      "gameName": "Mercado",
+      "tmName": "Gabriel Mercado",
+      "id": "45319",
+      "file": "45319.jpg"
+    },
+    {
+      "team": "INT",
+      "gameName": "Alan Patrick",
+      "tmName": "Alan Patrick",
+      "id": "104505",
+      "file": "104505.png"
+    },
+    {
+      "team": "INT",
+      "gameName": "Bruno Tabata",
+      "tmName": "Bruno Tabata",
+      "id": "438202",
+      "file": "438202.jpg"
+    },
+    {
+      "team": "SAN",
+      "gameName": "Gabriel Brazão",
+      "tmName": "Gabriel Brazão",
+      "id": "371247",
+      "file": "371247.jpg"
+    },
+    {
+      "team": "SAN",
+      "gameName": "Luan Peres",
+      "tmName": "Luan Peres",
+      "id": "347913",
+      "file": "347913.png"
+    },
+    {
+      "team": "SAN",
+      "gameName": "Zé Ivaldo",
+      "tmName": "Zé Ivaldo",
+      "id": "484848",
+      "file": "484848.jpg"
+    },
+    {
+      "team": "SAN",
+      "gameName": "João Schmidt",
+      "tmName": "João Schmidt",
+      "id": "198859",
+      "file": "198859.jpg"
+    },
+    {
+      "team": "SAN",
+      "gameName": "Tomás Rincón",
+      "tmName": "Tomás Rincón",
+      "id": "75942",
+      "file": "75942.jpg"
+    },
+    {
+      "team": "SAN",
+      "gameName": "Neymar",
+      "tmName": "Neymar",
+      "id": "68290",
+      "file": "68290.jpg"
+    },
+    {
+      "team": "SAN",
+      "gameName": "Gabigol",
+      "tmName": "Gabriel Barbosa",
+      "id": "244275",
+      "file": "244275.jpg"
+    },
+    {
+      "team": "GRE",
+      "gameName": "Weverton",
+      "tmName": "Weverton",
+      "id": "69400",
+      "file": "69400.jpg"
+    },
+    {
+      "team": "GRE",
+      "gameName": "Kannemann",
+      "tmName": "Walter Kannemann",
+      "id": "145400",
+      "file": "145400.jpg"
+    },
+    {
+      "team": "GRE",
+      "gameName": "João Pedro",
+      "tmName": "João Pedro",
+      "id": "342024",
+      "file": "342024.png"
+    },
+    {
+      "team": "GRE",
+      "gameName": "Villasanti",
+      "tmName": "Mathías Villasanti",
+      "id": "436385",
+      "file": "436385.jpg"
+    },
+    {
+      "team": "GRE",
+      "gameName": "Dodi",
+      "tmName": "Dodi",
+      "id": "373174",
+      "file": "373174.jpg"
+    }
+  ],
+  "unmatched": [
+    {
+      "team": "FLA",
+      "name": "Gerson"
+    },
+    {
+      "team": "FLU",
+      "name": "Renan Lodi"
+    },
+    {
+      "team": "FLU",
+      "name": "Nino"
+    },
+    {
+      "team": "FLU",
+      "name": "Manoel"
+    },
+    {
+      "team": "FLU",
+      "name": "André"
+    },
+    {
+      "team": "FLU",
+      "name": "Arias"
+    },
+    {
+      "team": "FLU",
+      "name": "Kauã Elias"
+    },
+    {
+      "team": "CAP",
+      "name": "Léo Linck"
+    },
+    {
+      "team": "CAP",
+      "name": "Thiago Heleno"
+    },
+    {
+      "team": "CAP",
+      "name": "Kaique Rocha"
+    },
+    {
+      "team": "CAP",
+      "name": "Lucas Fasson"
+    },
+    {
+      "team": "CAP",
+      "name": "Abner"
+    },
+    {
+      "team": "CAP",
+      "name": "Erick"
+    },
+    {
+      "team": "CAP",
+      "name": "Christian"
+    },
+    {
+      "team": "CAP",
+      "name": "Di Yorio"
+    },
+    {
+      "team": "CAP",
+      "name": "Cuello"
+    },
+    {
+      "team": "CAP",
+      "name": "Vitor Hugo"
+    },
+    {
+      "team": "RBB",
+      "name": "Luan Candido"
+    },
+    {
+      "team": "RBB",
+      "name": "Eduardo Santos"
+    },
+    {
+      "team": "RBB",
+      "name": "Léo Realpe"
+    },
+    {
+      "team": "RBB",
+      "name": "Nathan Mendes"
+    },
+    {
+      "team": "RBB",
+      "name": "Jhon Jhon"
+    },
+    {
+      "team": "RBB",
+      "name": "Jadsom"
+    },
+    {
+      "team": "RBB",
+      "name": "Laquintana"
+    },
+    {
+      "team": "RBB",
+      "name": "Helinho"
+    },
+    {
+      "team": "RBB",
+      "name": "Guilherme"
+    },
+    {
+      "team": "RBB",
+      "name": "Vitinho"
+    },
+    {
+      "team": "BAH",
+      "name": "Marcos Felipe"
+    },
+    {
+      "team": "BAH",
+      "name": "Adriel"
+    },
+    {
+      "team": "BAH",
+      "name": "Santiago Arias"
+    },
+    {
+      "team": "BAH",
+      "name": "Rezende"
+    },
+    {
+      "team": "BAH",
+      "name": "Thaciano"
+    },
+    {
+      "team": "BAH",
+      "name": "Biel"
+    },
+    {
+      "team": "BAH",
+      "name": "Rafael Ratão"
+    },
+    {
+      "team": "CFC",
+      "name": "Gabriel Vasconcelos"
+    },
+    {
+      "team": "CFC",
+      "name": "Sassá"
+    },
+    {
+      "team": "CFC",
+      "name": "Thalisson"
+    },
+    {
+      "team": "CFC",
+      "name": "Chancellor"
+    },
+    {
+      "team": "CFC",
+      "name": "Natanael"
+    },
+    {
+      "team": "CFC",
+      "name": "Diego Porfírio"
+    },
+    {
+      "team": "CFC",
+      "name": "William Matheus"
+    },
+    {
+      "team": "CFC",
+      "name": "Morelli"
+    },
+    {
+      "team": "CFC",
+      "name": "Bernardo"
+    },
+    {
+      "team": "CFC",
+      "name": "Matheus Bueno"
+    },
+    {
+      "team": "CFC",
+      "name": "Val"
+    },
+    {
+      "team": "CFC",
+      "name": "Alef Manga"
+    },
+    {
+      "team": "CFC",
+      "name": "Júnior Brumado"
+    },
+    {
+      "team": "CFC",
+      "name": "Robson"
+    },
+    {
+      "team": "CFC",
+      "name": "Rodrigão"
+    },
+    {
+      "team": "SPF",
+      "name": "Rafael"
+    },
+    {
+      "team": "SPF",
+      "name": "Young"
+    },
+    {
+      "team": "SPF",
+      "name": "Diego Costa"
+    },
+    {
+      "team": "SPF",
+      "name": "Beraldo"
+    },
+    {
+      "team": "SPF",
+      "name": "Sabino"
+    },
+    {
+      "team": "SPF",
+      "name": "Arboleda"
+    },
+    {
+      "team": "SPF",
+      "name": "Welington"
+    },
+    {
+      "team": "SPF",
+      "name": "Igor Vinícius"
+    },
+    {
+      "team": "SPF",
+      "name": "Marcos Antonio"
+    },
+    {
+      "team": "SPF",
+      "name": "Pablo Maia"
+    },
+    {
+      "team": "SPF",
+      "name": "Alisson"
+    },
+    {
+      "team": "SPF",
+      "name": "Danielzinho"
+    },
+    {
+      "team": "SPF",
+      "name": "Bobadilla"
+    },
+    {
+      "team": "SPF",
+      "name": "Cauly"
+    },
+    {
+      "team": "SPF",
+      "name": "Calleri"
+    },
+    {
+      "team": "SPF",
+      "name": "Luciano"
+    },
+    {
+      "team": "SPF",
+      "name": "Ferreirinha"
+    },
+    {
+      "team": "CAM",
+      "name": "Guilherme Queiroz"
+    },
+    {
+      "team": "CAM",
+      "name": "Renzo Saravia"
+    },
+    {
+      "team": "CAM",
+      "name": "Rubens"
+    },
+    {
+      "team": "CAM",
+      "name": "Otávio"
+    },
+    {
+      "team": "CAM",
+      "name": "Zaracho"
+    },
+    {
+      "team": "CAM",
+      "name": "Fausto Vera"
+    },
+    {
+      "team": "CAM",
+      "name": "Rony"
+    },
+    {
+      "team": "COR",
+      "name": "Hugo Souza"
+    },
+    {
+      "team": "COR",
+      "name": "Matheus Donelli"
+    },
+    {
+      "team": "COR",
+      "name": "Gabriel Paulista"
+    },
+    {
+      "team": "COR",
+      "name": "André Ramalho"
+    },
+    {
+      "team": "COR",
+      "name": "Cacá"
+    },
+    {
+      "team": "COR",
+      "name": "Matheuzinho"
+    },
+    {
+      "team": "COR",
+      "name": "Hugo"
+    },
+    {
+      "team": "COR",
+      "name": "Bidu"
+    },
+    {
+      "team": "COR",
+      "name": "Breno Bidon"
+    },
+    {
+      "team": "COR",
+      "name": "Rodrigo Garro"
+    },
+    {
+      "team": "COR",
+      "name": "José Martínez"
+    },
+    {
+      "team": "COR",
+      "name": "Matheus Pereira"
+    },
+    {
+      "team": "COR",
+      "name": "Raniele"
+    },
+    {
+      "team": "COR",
+      "name": "Memphis Depay"
+    },
+    {
+      "team": "COR",
+      "name": "Yuri Alberto"
+    },
+    {
+      "team": "COR",
+      "name": "Kaio César"
+    },
+    {
+      "team": "COR",
+      "name": "Héctor Hernández"
+    },
+    {
+      "team": "CRU",
+      "name": "Anderson"
+    },
+    {
+      "team": "CRU",
+      "name": "Cássio"
+    },
+    {
+      "team": "CRU",
+      "name": "Fabrício Bruno"
+    },
+    {
+      "team": "CRU",
+      "name": "William"
+    },
+    {
+      "team": "CRU",
+      "name": "Villalba"
+    },
+    {
+      "team": "CRU",
+      "name": "Kaiki Bruno"
+    },
+    {
+      "team": "CRU",
+      "name": "Marlon"
+    },
+    {
+      "team": "CRU",
+      "name": "Fagner"
+    },
+    {
+      "team": "CRU",
+      "name": "Lucas Silva"
+    },
+    {
+      "team": "CRU",
+      "name": "Matheus Henrique"
+    },
+    {
+      "team": "CRU",
+      "name": "Ramiro"
+    },
+    {
+      "team": "CRU",
+      "name": "Christian"
+    },
+    {
+      "team": "CRU",
+      "name": "Kaio Jorge"
+    },
+    {
+      "team": "CRU",
+      "name": "Gabriel Veron"
+    },
+    {
+      "team": "CRU",
+      "name": "Rafa Silva"
+    },
+    {
+      "team": "CRU",
+      "name": "Lautaro Díaz"
+    },
+    {
+      "team": "CRU",
+      "name": "João Marcelo"
+    },
+    {
+      "team": "BOT",
+      "name": "Ythallo"
+    },
+    {
+      "team": "BOT",
+      "name": "Artur"
+    },
+    {
+      "team": "VIT",
+      "name": "Muriel"
+    },
+    {
+      "team": "VIT",
+      "name": "Raúl Cáceres"
+    },
+    {
+      "team": "VIT",
+      "name": "Wagner Leonardo"
+    },
+    {
+      "team": "VIT",
+      "name": "PK"
+    },
+    {
+      "team": "VIT",
+      "name": "Willean Lepo"
+    },
+    {
+      "team": "VIT",
+      "name": "Léo Naldi"
+    },
+    {
+      "team": "VIT",
+      "name": "Matheusinho"
+    },
+    {
+      "team": "VIT",
+      "name": "Eduardo"
+    },
+    {
+      "team": "VIT",
+      "name": "Léo Ceará"
+    },
+    {
+      "team": "VIT",
+      "name": "Janderson"
+    },
+    {
+      "team": "VIT",
+      "name": "David"
+    },
+    {
+      "team": "INT",
+      "name": "Clayton Sampaio"
+    },
+    {
+      "team": "INT",
+      "name": "Bustos"
+    },
+    {
+      "team": "INT",
+      "name": "Renê"
+    },
+    {
+      "team": "INT",
+      "name": "Rômulo"
+    },
+    {
+      "team": "INT",
+      "name": "Mauricio"
+    },
+    {
+      "team": "INT",
+      "name": "Wesley"
+    },
+    {
+      "team": "INT",
+      "name": "Enner Valencia"
+    },
+    {
+      "team": "INT",
+      "name": "Ricardo Mathias"
+    },
+    {
+      "team": "INT",
+      "name": "Alario"
+    },
+    {
+      "team": "SAN",
+      "name": "João Paulo"
+    },
+    {
+      "team": "SAN",
+      "name": "Messias"
+    },
+    {
+      "team": "SAN",
+      "name": "Kevyson"
+    },
+    {
+      "team": "SAN",
+      "name": "Lucas Pires"
+    },
+    {
+      "team": "SAN",
+      "name": "Giuliano"
+    },
+    {
+      "team": "SAN",
+      "name": "Diego Pituca"
+    },
+    {
+      "team": "SAN",
+      "name": "Ângelo"
+    },
+    {
+      "team": "SAN",
+      "name": "Marcos Leonardo"
+    },
+    {
+      "team": "SAN",
+      "name": "Wendel Silva"
+    },
+    {
+      "team": "GRE",
+      "name": "Tiago Volpi"
+    },
+    {
+      "team": "GRE",
+      "name": "Geromel"
+    },
+    {
+      "team": "GRE",
+      "name": "Reinaldo"
+    },
+    {
+      "team": "GRE",
+      "name": "Mayk"
+    },
+    {
+      "team": "GRE",
+      "name": "Pepê"
+    },
+    {
+      "team": "GRE",
+      "name": "Cristaldo"
+    },
+    {
+      "team": "GRE",
+      "name": "Soteldo"
+    },
+    {
+      "team": "GRE",
+      "name": "Diego Costa"
+    },
+    {
+      "team": "GRE",
+      "name": "Aravena"
+    },
+    {
+      "team": "VAS",
+      "name": "Léo Jardim"
+    },
+    {
+      "team": "VAS",
+      "name": "Guto"
+    },
+    {
+      "team": "VAS",
+      "name": "João Victor"
+    },
+    {
+      "team": "VAS",
+      "name": "Maicon"
+    },
+    {
+      "team": "VAS",
+      "name": "Lucas Piton"
+    },
+    {
+      "team": "VAS",
+      "name": "Puma Rodríguez"
+    },
+    {
+      "team": "VAS",
+      "name": "Lyncon"
+    },
+    {
+      "team": "VAS",
+      "name": "Matheus Barbosa"
+    },
+    {
+      "team": "VAS",
+      "name": "Jair"
+    },
+    {
+      "team": "VAS",
+      "name": "Payet"
+    },
+    {
+      "team": "VAS",
+      "name": "Zé Gabriel"
+    },
+    {
+      "team": "VAS",
+      "name": "Vegetti"
+    },
+    {
+      "team": "VAS",
+      "name": "Maxime Dominguez"
+    },
+    {
+      "team": "VAS",
+      "name": "David"
+    },
+    {
+      "team": "REM",
+      "name": "Vinícius"
+    },
+    {
+      "team": "REM",
+      "name": "Thiago Coelho"
+    },
+    {
+      "team": "REM",
+      "name": "Rafael Jansen"
+    },
+    {
+      "team": "REM",
+      "name": "Everton Sena"
+    },
+    {
+      "team": "REM",
+      "name": "Marlon"
+    },
+    {
+      "team": "REM",
+      "name": "Igor Fernandes"
+    },
+    {
+      "team": "REM",
+      "name": "Anderson Uchôa"
+    },
+    {
+      "team": "REM",
+      "name": "Jean Patrick"
+    },
+    {
+      "team": "REM",
+      "name": "Wallisson"
+    },
+    {
+      "team": "REM",
+      "name": "Ronald"
+    },
+    {
+      "team": "REM",
+      "name": "Rodrigo Pimpão"
+    },
+    {
+      "team": "REM",
+      "name": "Savio"
+    },
+    {
+      "team": "REM",
+      "name": "Felipe Gedoz"
+    },
+    {
+      "team": "MIR",
+      "name": "Alex Muralha"
+    },
+    {
+      "team": "MIR",
+      "name": "Muralha"
+    },
+    {
+      "team": "MIR",
+      "name": "Luís Otávio"
+    },
+    {
+      "team": "MIR",
+      "name": "Daniel Borges"
+    },
+    {
+      "team": "MIR",
+      "name": "Warley"
+    },
+    {
+      "team": "MIR",
+      "name": "Mateus Costa"
+    },
+    {
+      "team": "MIR",
+      "name": "Danilo Avelar"
+    },
+    {
+      "team": "MIR",
+      "name": "Neto Moura"
+    },
+    {
+      "team": "MIR",
+      "name": "Gabriel"
+    },
+    {
+      "team": "MIR",
+      "name": "Isidro Pitta"
+    },
+    {
+      "team": "MIR",
+      "name": "Iury Castilho"
+    },
+    {
+      "team": "MIR",
+      "name": "Fabrício Daniel"
+    },
+    {
+      "team": "MIR",
+      "name": "Vinicius Kiss"
+    },
+    {
+      "team": "CHA",
+      "name": "Keiller"
+    },
+    {
+      "team": "CHA",
+      "name": "Saulo"
+    },
+    {
+      "team": "CHA",
+      "name": "Victor Ferraz"
+    },
+    {
+      "team": "CHA",
+      "name": "Dirceu"
+    },
+    {
+      "team": "CHA",
+      "name": "Maycon Douglas"
+    },
+    {
+      "team": "CHA",
+      "name": "Matheus Ribeiro"
+    },
+    {
+      "team": "CHA",
+      "name": "Jefinho"
+    },
+    {
+      "team": "CHA",
+      "name": "Galdezani"
+    },
+    {
+      "team": "CHA",
+      "name": "Moisés"
+    },
+    {
+      "team": "CHA",
+      "name": "Alan"
+    },
+    {
+      "team": "CHA",
+      "name": "Marcelo Ortiz"
+    },
+    {
+      "team": "CHA",
+      "name": "Anselmo Ramon"
+    },
+    {
+      "team": "CHA",
+      "name": "Perotti"
+    },
+    {
+      "team": "CHA",
+      "name": "Vini Locatelli"
+    }
+  ],
+  "errors": []
+}

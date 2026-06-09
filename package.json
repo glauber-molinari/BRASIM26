@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "import:players": "node scripts/sync-transfermarkt.mjs",
+    "import:players:fresh": "node scripts/sync-transfermarkt.mjs --fresh",
+    "sync:transfermarkt": "node scripts/sync-transfermarkt.mjs",
+    "sync:transfermarkt:fresh": "node scripts/sync-transfermarkt.mjs --fresh",
+    "sync:squads": "node scripts/sync-transfermarkt.mjs --squads-only"
   },
   "dependencies": {
     "react": "^18",

@@ -1,0 +1,130 @@
+{
+  "teams": [],
+  "photoErrors": [
+    {
+      "team": "FLU",
+      "name": "Alisson",
+      "error": "Error: Photo HTTP 502"
+    },
+    {
+      "team": "CAP",
+      "name": "Carlos Terán",
+      "error": "Error: Photo HTTP 502"
+    },
+    {
+      "team": "CAP",
+      "name": "Alejandro García",
+      "error": "Error: Photo HTTP 502"
+    },
+    {
+      "team": "RBB",
+      "name": "Isidro Pitta",
+      "error": "Error: Photo HTTP 502"
+    },
+    {
+      "team": "CFC",
+      "name": "Pedro Morisco",
+      "error": "Error: Photo HTTP 502"
+    },
+    {
+      "team": "CFC",
+      "name": "Tinga",
+      "error": "Error: Photo HTTP 502"
+    },
+    {
+      "team": "CFC",
+      "name": "Lucas Ronier",
+      "error": "Error: Photo HTTP 502"
+    },
+    {
+      "team": "SPF",
+      "name": "Leonardo Fernández",
+      "error": "Error: Photo HTTP 502"
+    },
+    {
+      "team": "SPF",
+      "name": "Luis Angulo",
+      "error": "Error: Photo HTTP 502"
+    },
+    {
+      "team": "CAM",
+      "name": "Patrick",
+      "error": "Error: Photo HTTP 502"
+    },
+    {
+      "team": "CAM",
+      "name": "Índio",
+      "error": "Error: Photo HTTP 502"
+    },
+    {
+      "team": "CRU",
+      "name": "Antonino Barillà",
+      "error": "Error: Photo HTTP 502"
+    },
+    {
+      "team": "BOT",
+      "name": "Nathan Fernandes",
+      "error": "Error: Photo HTTP 502"
+    },
+    {
+      "team": "VIT",
+      "name": "Riccieli",
+      "error": "Error: Photo HTTP 502"
+    },
+    {
+      "team": "INT",
+      "name": "Bruno Henrique",
+      "error": "Error: Photo HTTP 502"
+    },
+    {
+      "team": "INT",
+      "name": "Kayky",
+      "error": "Error: Photo HTTP 502"
+    },
+    {
+      "team": "SAN",
+      "name": "Gustavinho",
+      "error": "Error: Photo HTTP 502"
+    },
+    {
+      "team": "SAN",
+      "name": "Miguelito",
+      "error": "Error: Photo HTTP 502"
+    },
+    {
+      "team": "GRE",
+      "name": "Gabriel Grando",
+      "error": "Error: Photo HTTP 502"
+    },
+    {
+      "team": "GRE",
+      "name": "José Enamorado",
+      "error": "Error: Photo HTTP 502"
+    },
+    {
+      "team": "VAS",
+      "name": "Curtis Tilt",
+      "error": "Error: Photo HTTP 502"
+    },
+    {
+      "team": "VAS",
+      "name": "Antoni Sarcevic",
+      "error": "Error: Photo HTTP 502"
+    },
+    {
+      "team": "REM",
+      "name": "Patrick",
+      "error": "Error: Photo HTTP 502"
+    },
+    {
+      "team": "MIR",
+      "name": "Batuhan Yavuz",
+      "error": "Error: Photo HTTP 502"
+    },
+    {
+      "team": "CHA",
+      "name": "Marvin Benefo",
+      "error": "Error: Photo HTTP 502"
+    }
+  ]
+}

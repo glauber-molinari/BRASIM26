@@ -1,0 +1,48 @@
+// Logos e estádios — fotos de jogadores em data/playerPhotos.ts (Transfermarkt)
+export const SPORTSDB_PLAYER_PHOTOS: Record<string, string> = {};
+
+export const SPORTSDB_TEAM_STADIUMS: Record<string, string> = {
+  PAL: 'Allianz Parque',
+  FLA: 'Maracanã',
+  FLU: 'Maracanã',
+  CAP: 'Arena da Baixada',
+  RBB: 'Nabi Abi Chedid',
+  BAH: 'Arena Fonte Nova',
+  CFC: 'Couto Pereira',
+  SPF: 'Morumbi',
+  CAM: 'Arena MRV',
+  COR: 'Neo Química Arena',
+  CRU: 'Mineirão',
+  BOT: 'Nilton Santos',
+  VIT: 'Barradão',
+  INT: 'Beira-Rio',
+  SAN: 'Vila Belmiro',
+  GRE: 'Arena do Grêmio',
+  VAS: 'São Januário',
+  REM: 'Baenão',
+  MIR: 'Maião',
+  CHA: 'Arena Condá',
+};
+
+export const SPORTSDB_TEAM_LOGOS: Record<string, string> = {
+  PAL: 'https://r2.thesportsdb.com/images/media/team/badge/vsqwqp1473538105.png',
+  FLA: 'https://r2.thesportsdb.com/images/media/team/badge/syptwx1473538074.png',
+  FLU: 'https://r2.thesportsdb.com/images/media/team/badge/stvvwp1473538082.png',
+  CAP: 'https://r2.thesportsdb.com/images/media/team/badge/irzu1u1554237406.png',
+  RBB: 'https://r2.thesportsdb.com/images/media/team/badge/2p7tl41701423595.png',
+  BAH: 'https://r2.thesportsdb.com/images/media/team/badge/xuvtsv1473539308.png',
+  CFC: 'https://r2.thesportsdb.com/images/media/team/badge/ywwsyu1473538050.png',
+  SPF: 'https://r2.thesportsdb.com/images/media/team/badge/sxpupx1473538135.png',
+  CAM: 'https://r2.thesportsdb.com/images/media/team/badge/x5lixs1743742872.png',
+  COR: 'https://r2.thesportsdb.com/images/media/team/badge/vvuvps1473538042.png',
+  CRU: 'https://r2.thesportsdb.com/images/media/team/badge/upsvvu1473538059.png',
+  BOT: 'https://r2.thesportsdb.com/images/media/team/badge/bs5mbw1733004596.png',
+  VIT: 'https://r2.thesportsdb.com/images/media/team/badge/tysrrx1473538156.png',
+  INT: 'https://r2.thesportsdb.com/images/media/team/badge/yprvxx1473538097.png',
+  SAN: 'https://r2.thesportsdb.com/images/media/team/badge/j8xk9g1679447486.png',
+  GRE: 'https://r2.thesportsdb.com/images/media/team/badge/uvpwyt1473538089.png',
+  VAS: 'https://r2.thesportsdb.com/images/media/team/badge/ynqlxo1630521109.png',
+  REM: 'https://r2.thesportsdb.com/images/media/team/badge/u36jfy1579341655.png',
+  MIR: 'https://r2.thesportsdb.com/images/media/team/badge/pw8uo11765900737.png',
+  CHA: 'https://r2.thesportsdb.com/images/media/team/badge/wy0e1i1765900601.png',
+};

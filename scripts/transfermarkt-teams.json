@@ -1,0 +1,22 @@
+[
+  { "short": "PAL", "slug": "se-palmeiras-sao-paulo", "verein": 1023 },
+  { "short": "FLA", "slug": "flamengo-rio-de-janeiro", "verein": 614 },
+  { "short": "FLU", "slug": "fluminense-rio-de-janeiro", "verein": 2462 },
+  { "short": "CAP", "slug": "club-athletico-paranaense", "verein": 679 },
+  { "short": "RBB", "slug": "red-bull-bragantino", "verein": 8793 },
+  { "short": "BAH", "slug": "esporte-clube-bahia", "verein": 10010 },
+  { "short": "CFC", "slug": "coritiba-fc", "verein": 776 },
+  { "short": "SPF", "slug": "sao-paulo-futebol-clube", "verein": 861 },
+  { "short": "CAM", "slug": "clube-atletico-mineiro", "verein": 330 },
+  { "short": "COR", "slug": "sc-corinthians-paulista", "verein": 720 },
+  { "short": "CRU", "slug": "cruzeiro-esporte-clube", "verein": 1386 },
+  { "short": "BOT", "slug": "botafogo-rio-de-janeiro", "verein": 537 },
+  { "short": "VIT", "slug": "ec-vitoria", "verein": 2125 },
+  { "short": "INT", "slug": "sport-club-internacional", "verein": 6600 },
+  { "short": "SAN", "slug": "fc-santos", "verein": 221 },
+  { "short": "GRE", "slug": "gremio-fbpa", "verein": 210 },
+  { "short": "VAS", "slug": "cr-vasco-da-gama", "verein": 1027 },
+  { "short": "REM", "slug": "clube-do-remo-pa-", "verein": 10997 },
+  { "short": "MIR", "slug": "mirassol-futebol-clube", "verein": 11282 },
+  { "short": "CHA", "slug": "associacao-chapecoense", "verein": 7374 }
+]
