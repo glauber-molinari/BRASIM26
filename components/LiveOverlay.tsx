@@ -21,6 +21,7 @@ interface LiveOverlayProps {
   onLiveComplete: () => void;
   onContinue: () => void;
   onReset: () => void;
+  onEditLineup: () => void;
   onDismiss: () => void;
   standings: Standing[];
   roundMatches: StoredMatch[];
@@ -39,6 +40,7 @@ export default function LiveOverlay({
   onLiveComplete,
   onContinue,
   onReset,
+  onEditLineup,
   onDismiss,
   standings,
   roundMatches,
@@ -351,7 +353,10 @@ export default function LiveOverlay({
               <button type="button" onClick={onContinue} className="btn-primary w-full py-3.5">
                 Continuar campeonato →
               </button>
-              <button type="button" onClick={onReset} className="btn-secondary w-full py-3">
+              <button type="button" onClick={onEditLineup} className="btn-secondary w-full py-3">
+                ✏️ Alterar Escalação
+              </button>
+              <button type="button" onClick={onReset} className="btn-secondary w-full py-3 opacity-60">
                 ✕ Fechar e reiniciar jogo
               </button>
             </div>

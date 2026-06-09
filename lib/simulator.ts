@@ -1,5 +1,6 @@
 import { TEAMS, MY_TEAM_ID, MY_TEAM_EMOJI } from '@/data/teams';
 import type {
+  GameStyle,
   LineupSlot,
   LineupStrength,
   MatchEvent,
@@ -174,16 +175,39 @@ function teamXG(att: number, oppDef: number, advantage = 1): number {
   return Math.max(0.3, BASE_XG * (att / AVG_RATING) / (oppDef / AVG_RATING) * advantage);
 }
 
+const STYLE_MULT: Record<GameStyle, { my: number; opp: number }> = {
+  normal:       { my: 1.00, opp: 1.00 },
+  contraAtaque: { my: 0.88, opp: 0.82 },
+  retranca:     { my: 0.72, opp: 0.78 },
+  tikaTaka:     { my: 1.10, opp: 0.90 },
+};
+
+const POSS_RANGE: Record<GameStyle, [number, number]> = {
+  normal:       [42, 62],
+  contraAtaque: [35, 50],
+  retranca:     [30, 48],
+  tikaTaka:     [55, 70],
+};
+
 export function simMatch(
   homeId: number,
   awayId: number,
-  lineup: LineupSlot[]
+  lineup: LineupSlot[],
+  gameStyle: GameStyle = 'normal'
 ): MatchResult {
   const home = getTeamData(homeId, lineup);
   const away = getTeamData(awayId, lineup);
 
-  const hXG = teamXG(home.att, away.def, HOME_ADV);
-  const aXG = teamXG(away.att, home.def);
+  const isMyHome = homeId === MY_TEAM_ID;
+  const isMyAway = awayId === MY_TEAM_ID;
+  const style = (isMyHome || isMyAway) ? gameStyle : 'normal';
+  const mult = STYLE_MULT[style];
+
+  const hAttMult = isMyHome ? mult.my : isMyAway ? mult.opp : 1;
+  const aAttMult = isMyAway ? mult.my : isMyHome ? mult.opp : 1;
+
+  const hXG = teamXG(home.att * hAttMult, away.def, HOME_ADV);
+  const aXG = teamXG(away.att * aAttMult, home.def);
 
   const hG = poissonSample(hXG);
   const aG = poissonSample(aXG);
@@ -237,7 +261,8 @@ export function simMatch(
 
   const hShots = rnd(8, 18);
   const aShots = rnd(6, 16);
-  const hPoss = rnd(42, 62);
+  const [possMin, possMax] = POSS_RANGE[style];
+  const hPoss = isMyHome ? rnd(possMin, possMax) : isMyAway ? 100 - rnd(possMin, possMax) : rnd(42, 62);
 
   return { hG, aG, evs, hShots, aShots, hPoss };
 }

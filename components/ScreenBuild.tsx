@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { TEAMS } from '@/data/teams';
 import { TACTIC_KEYS } from '@/data/tactics';
-import type { LineupSlot, Position, TacticKey } from '@/lib/types';
+import type { GameStyle, LineupSlot, Position, SelectedPlayer, TacticKey } from '@/lib/types';
 import PitchBuilder from './PitchBuilder';
 import SlotPicker from './SlotPicker';
 import TeamLogo from './TeamLogo';
@@ -19,7 +19,21 @@ interface ScreenBuildProps {
   onRollRandom: () => void;
   diceSpinning: boolean;
   activeTeamTab?: number;
+  bench: (SelectedPlayer | null)[];
+  onBenchChange: (bench: (SelectedPlayer | null)[]) => void;
+  gameStyle: GameStyle;
+  onGameStyleChange: (s: GameStyle) => void;
+  isContinuing: boolean;
+  currentRound: number;
+  onContinueSim: () => void;
 }
+
+const GAME_STYLES: { key: GameStyle; label: string; icon: string; desc: string }[] = [
+  { key: 'normal',       label: 'Normal',        icon: '⚖️', desc: 'Jogo equilibrado' },
+  { key: 'contraAtaque', label: 'Contra-ataque',  icon: '⚡', desc: 'Defende e explora os espaços' },
+  { key: 'retranca',     label: 'Retranca',       icon: '🛡️', desc: 'Foco total na defesa' },
+  { key: 'tikaTaka',     label: 'Tiki-Taka',      icon: '🎯', desc: 'Posse e pressão no ataque' },
+];
 
 const POS_LABELS: Record<Position, string> = {
   GK: 'Goleiros',
@@ -38,17 +52,36 @@ export default function ScreenBuild({
   onRollRandom,
   diceSpinning,
   activeTeamTab = 0,
+  bench,
+  onBenchChange,
+  gameStyle,
+  onGameStyleChange,
+  isContinuing,
+  currentRound,
+  onContinueSim,
 }: ScreenBuildProps) {
   const [activeTab, setActiveTab] = useState(activeTeamTab);
+  const [benchPickerIdx, setBenchPickerIdx] = useState<number | null>(null);
 
   useEffect(() => {
     setActiveTab(activeTeamTab);
   }, [activeTeamTab]);
   const [pickerIdx, setPickerIdx] = useState<number | null>(null);
 
+  const sortedTeams = [...TEAMS.map((t, i) => ({ t, i }))].sort((a, b) =>
+    a.t.name.localeCompare(b.t.name, 'pt-BR')
+  );
+
   const count = lineup.filter((s) => s.player).length;
   const team = TEAMS[activeTab];
-  const used = teamUsage[team.id] || 0;
+
+  // Combined usage: starters + bench count toward 3-per-team limit
+  const combinedUsage: Record<number, number> = { ...teamUsage };
+  bench.forEach((p) => {
+    if (p) combinedUsage[p.tid] = (combinedUsage[p.tid] || 0) + 1;
+  });
+
+  const used = combinedUsage[team.id] || 0;
   const full = used >= 3;
 
   const byPos: Record<Position, typeof team.squad> = { GK: [], DF: [], MF: [], FW: [] };
@@ -70,7 +103,7 @@ export default function ScreenBuild({
     }
 
     const emptyIdx = lineup.findIndex((s) => !s.player && s.pos === pos);
-    if (emptyIdx >= 0 && (usage[tid] || 0) < 3) {
+    if (emptyIdx >= 0 && combinedUsage[tid] < 3) {
       const t = TEAMS.find((x) => x.id === tid)!;
       const newLineup = lineup.map((s, i) =>
         i === emptyIdx
@@ -114,13 +147,33 @@ export default function ScreenBuild({
     setPickerIdx(null);
   };
 
+  const pickBenchPlayer = (tid: number, name: string, pos: Position) => {
+    if (benchPickerIdx === null) return;
+    const t = TEAMS.find((x) => x.id === tid)!;
+    const newBench = bench.map((p, i) =>
+      i === benchPickerIdx
+        ? { n: name, p: pos, tid, tc: t.c, tl: t.logo, tn: t.name, ts: t.short }
+        : p
+    );
+    onBenchChange(newBench);
+    setBenchPickerIdx(null);
+  };
+
+  const removeBenchSlot = (idx: number) => {
+    const newBench = bench.map((p, i) => (i === idx ? null : p));
+    onBenchChange(newBench);
+    setBenchPickerIdx(null);
+  };
+
   return (
     <>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="section-title">Monte seu time</h2>
+          <h2 className="section-title">{isContinuing ? 'Alterar Escalação' : 'Monte seu time'}</h2>
           <p className="section-sub">
-            Máx. 3 jogadores por time · Complete 11 titulares · Escolha a tática
+            {isContinuing
+              ? `Campeonato em andamento · Rodada ${currentRound}/38`
+              : 'Máx. 3 jogadores por time · Complete 11 titulares · Escolha a tática'}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -141,16 +194,22 @@ export default function ScreenBuild({
           >
             🗑️
           </button>
-          <button type="button" onClick={onStart} disabled={count < 11} className="btn-primary">
-            Simular Campeonato →
-          </button>
+          {isContinuing ? (
+            <button type="button" onClick={onContinueSim} disabled={count < 11} className="btn-primary">
+              Continuar (R.{currentRound}) →
+            </button>
+          ) : (
+            <button type="button" onClick={onStart} disabled={count < 11} className="btn-primary">
+              Simular Campeonato →
+            </button>
+          )}
         </div>
       </div>
 
       <div className="grid items-start gap-4 md:grid-cols-[1fr_340px]">
         <div>
           <div className="mb-3 flex flex-wrap gap-1.5">
-            {TEAMS.map((t, i) => (
+            {sortedTeams.map(({ t, i }) => (
               <button
                 key={t.id}
                 type="button"
@@ -237,6 +296,30 @@ export default function ScreenBuild({
           </div>
 
           <div className="panel">
+            <div className="panel-title">Estilo de Jogo</div>
+            <div className="grid grid-cols-2 gap-1.5">
+              {GAME_STYLES.map((s) => (
+                <button
+                  key={s.key}
+                  type="button"
+                  onClick={() => onGameStyleChange(s.key)}
+                  className={`flex flex-col items-start gap-0.5 rounded-lg border-2 px-3 py-2 text-left transition-colors ${
+                    gameStyle === s.key
+                      ? 'border-[var(--green-light)] bg-[rgba(31,196,94,0.08)]'
+                      : 'border-[var(--border2)] bg-[var(--bg3)] hover:border-[var(--border)]'
+                  }`}
+                >
+                  <span className="text-base">{s.icon}</span>
+                  <span className={`font-condensed text-sm font-bold ${gameStyle === s.key ? 'text-[var(--green-light)]' : 'text-[var(--text)]'}`}>
+                    {s.label}
+                  </span>
+                  <span className="text-[10px] text-[var(--text3)]">{s.desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="panel">
             <div className="panel-title">Clique em uma posição para escalar</div>
             <PitchBuilder lineup={lineup} onSlotClick={setPickerIdx} />
           </div>
@@ -259,7 +342,34 @@ export default function ScreenBuild({
             </div>
           </div>
 
-          <div className="panel max-h-[220px] overflow-y-auto">
+          <div className="panel">
+            <div className="panel-title mb-2">Banco de Reservas</div>
+            {bench.map((p, i) => (
+              <div
+                key={i}
+                role="button"
+                tabIndex={0}
+                onClick={() => setBenchPickerIdx(i)}
+                onKeyDown={(e) => e.key === 'Enter' && setBenchPickerIdx(i)}
+                className={`flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-white/[0.04] ${!p ? 'opacity-50' : ''}`}
+              >
+                <span className="font-condensed w-5 text-center text-xs font-bold text-[var(--text3)]">
+                  R{i + 1}
+                </span>
+                {p ? (
+                  <>
+                    <TeamLogo logo={p.tl} fallback={p.tc} size={20} />
+                    <span className="flex-1 text-[var(--text)]">{p.n}</span>
+                    <span className={`pl-pbadge pos-${p.p} text-[9px]`}>{p.p}</span>
+                  </>
+                ) : (
+                  <span className="flex-1 text-xs text-[var(--text3)]">— Clique para escalar</span>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="panel max-h-[180px] overflow-y-auto">
             {lineup
               .filter((s) => s.player)
               .map((s, i) => (
@@ -283,10 +393,22 @@ export default function ScreenBuild({
         <SlotPicker
           slotIdx={pickerIdx}
           lineup={lineup}
-          teamUsage={teamUsage}
+          teamUsage={combinedUsage}
           onPick={pickPlayer}
           onRemove={removeSlot}
           onClose={() => setPickerIdx(null)}
+        />
+      )}
+
+      {benchPickerIdx !== null && (
+        <SlotPicker
+          slotIdx={-1}
+          lineup={lineup}
+          teamUsage={combinedUsage}
+          benchMode
+          onPick={pickBenchPlayer}
+          onRemove={() => removeBenchSlot(benchPickerIdx)}
+          onClose={() => setBenchPickerIdx(null)}
         />
       )}
     </>

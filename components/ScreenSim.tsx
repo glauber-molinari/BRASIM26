@@ -6,6 +6,7 @@ import { shn } from '@/lib/helpers';
 import type { LineupSlot, SimSpeed, StoredMatch } from '@/lib/types';
 import StandingsTable from './StandingsTable';
 import TeamLogo from './TeamLogo';
+import SchedulePanel from './SchedulePanel';
 import type { Standing } from '@/lib/types';
 
 interface ScreenSimProps {
@@ -195,10 +196,14 @@ export default function ScreenSim({
                 </div>
               ))}
           </div>
-          <div className="panel">
+          <div className="panel mb-3">
             <div className="panel-title">Classificação</div>
             <StandingsTable standings={standings} compact aroundMyTeam />
           </div>
+          <SchedulePanel
+            schedule={schedule}
+            allMatches={allMatches}
+          />
         </div>
       </div>
     </>

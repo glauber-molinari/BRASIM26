@@ -79,6 +79,8 @@ export interface MatchHistoryEntry {
 
 export type TacticKey = '4-4-2' | '4-3-3' | '4-5-1' | '3-5-2' | '5-3-2';
 
+export type GameStyle = 'normal' | 'contraAtaque' | 'retranca' | 'tikaTaka';
+
 export type SimSpeed = 700 | 250 | 60;
 
 export type Screen = 'setup' | 'build' | 'sim' | 'result';

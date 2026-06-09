@@ -9,6 +9,7 @@ interface SlotPickerProps {
   slotIdx: number;
   lineup: LineupSlot[];
   teamUsage: Record<number, number>;
+  benchMode?: boolean;
   onPick: (tid: number, name: string, pos: Position) => void;
   onRemove: (idx: number) => void;
   onClose: () => void;
@@ -18,17 +19,21 @@ export default function SlotPicker({
   slotIdx,
   lineup,
   teamUsage,
+  benchMode = false,
   onPick,
   onRemove,
   onClose,
 }: SlotPickerProps) {
-  const slot = lineup[slotIdx];
+  const slot = benchMode ? null : lineup[slotIdx];
+
   const usedKeys = new Set<string>();
   lineup.forEach((s, i) => {
     if (i !== slotIdx && s.player) {
       usedKeys.add(`${s.player.n}_${s.player.tid}`);
     }
   });
+
+  const title = benchMode ? 'Escalar Reserva' : `Escalar ${slot?.pos ?? ''}`;
 
   return (
     <div
@@ -38,7 +43,7 @@ export default function SlotPicker({
       <div className="flex max-h-[80vh] w-full max-w-[420px] flex-col rounded-2xl border-2 border-[var(--border2)] bg-[var(--bg2)] shadow-2xl">
         <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-4">
           <span className="font-condensed text-lg font-extrabold uppercase text-[var(--text)]">
-            Escalar {slot.pos}
+            {title}
           </span>
           <button
             type="button"
@@ -50,7 +55,7 @@ export default function SlotPicker({
         </div>
 
         <div className="flex-1 overflow-y-auto px-4 py-2.5">
-          {slot.player && (
+          {(slot?.player || benchMode) && (
             <button
               type="button"
               onClick={() => onRemove(slotIdx)}
@@ -62,7 +67,9 @@ export default function SlotPicker({
 
           {TEAMS.map((team) => {
             const canAdd = (teamUsage[team.id] || 0) < 3;
-            const players = team.squad.filter((p) => p.p === slot.pos);
+            const players = benchMode
+              ? team.squad
+              : team.squad.filter((p) => p.p === slot!.pos);
             if (!players.length) return null;
 
             return (
@@ -74,8 +81,8 @@ export default function SlotPicker({
                 </div>
                 {players.map((p) => {
                   const key = `${p.n}_${team.id}`;
-                  const isCur =
-                    slot.player?.n === p.n && slot.player?.tid === team.id;
+                  const isCur = !benchMode &&
+                    slot?.player?.n === p.n && slot?.player?.tid === team.id;
                   const isUsed = usedKeys.has(key);
                   const isBlocked = !isCur && !canAdd;
                   const disabled = isUsed || isBlocked;
@@ -85,7 +92,7 @@ export default function SlotPicker({
                       key={key}
                       type="button"
                       disabled={disabled}
-                      onClick={() => onPick(team.id, p.n, slot.pos)}
+                      onClick={() => onPick(team.id, p.n, p.p)}
                       className={`mb-0.5 flex w-full items-center gap-1.5 rounded-md border-none px-2 py-1.5 text-left ${
                         disabled
                           ? 'pointer-events-none cursor-default opacity-30'
