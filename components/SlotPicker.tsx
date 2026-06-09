@@ -1,7 +1,7 @@
 'use client';
 
 import { TEAMS } from '@/data/teams';
-import { PLAYER_PHOTOS } from '@/data/playerPhotos';
+import { getPlayerPhoto } from '@/data/playerPhotos';
 import type { LineupSlot, Position } from '@/lib/types';
 import TeamLogo from './TeamLogo';
 
@@ -96,9 +96,9 @@ export default function SlotPicker({
                         <span className={`pl-pbadge pos-${p.p} text-[9px] font-bold`}>
                           {p.p}
                         </span>
-                        {PLAYER_PHOTOS[p.n] && (
+                        {getPlayerPhoto(p.n) && (
                           <img
-                            src={PLAYER_PHOTOS[p.n]}
+                            src={getPlayerPhoto(p.n)}
                             alt={p.n}
                             className="absolute inset-0 h-full w-full object-cover object-top"
                             onError={(e) => { e.currentTarget.style.display = 'none'; }}

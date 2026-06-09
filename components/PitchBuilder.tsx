@@ -2,7 +2,7 @@
 
 import type { LineupSlot } from '@/lib/types';
 import { ini, shn } from '@/lib/helpers';
-import { PLAYER_PHOTOS } from '@/data/playerPhotos';
+import { getPlayerPhoto } from '@/data/playerPhotos';
 
 interface PitchBuilderProps {
   lineup: LineupSlot[];
@@ -55,9 +55,9 @@ export default function PitchBuilder({ lineup, onSlotClick }: PitchBuilderProps)
                       <span className="text-[9px] font-bold leading-none text-[#1a5e2a]">
                         {ini(slot.player.n)}
                       </span>
-                      {PLAYER_PHOTOS[slot.player.n] && (
+                      {getPlayerPhoto(slot.player.n) && (
                         <img
-                          src={PLAYER_PHOTOS[slot.player.n]}
+                          src={getPlayerPhoto(slot.player.n)}
                           alt={slot.player.n}
                           className="absolute inset-0 h-full w-full object-cover object-top"
                           onError={(e) => { e.currentTarget.style.display = 'none'; }}

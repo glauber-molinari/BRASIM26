@@ -1,4 +1,6 @@
 /** Gerado por scripts/sync-transfermarkt.mjs — não editar manualmente */
+import { withBasePath } from '@/lib/assets';
+
 export const PLAYER_PHOTOS: Record<string, string> = {
   "Abel Hernández": '/players/76608.jpg',
   "Ademir": '/players/544259.jpg',
@@ -537,5 +539,6 @@ export const PLAYER_PHOTOS: Record<string, string> = {
 };
 
 export function getPlayerPhoto(name: string): string | undefined {
-  return PLAYER_PHOTOS[name];
+  const path = PLAYER_PHOTOS[name];
+  return path ? withBasePath(path) : undefined;
 }
