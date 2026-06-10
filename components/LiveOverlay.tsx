@@ -298,14 +298,10 @@ export default function LiveOverlay({
                   <span className="min-w-[32px] rounded-md bg-[var(--bg3)] px-1.5 py-0.5 text-center text-xs font-bold text-[var(--text)]">
                     {ev.min}&apos;
                   </span>
-                  {ev.type === 'goal' ? (
-                    <PlayerAvatar name={ev.player} />
-                  ) : (
-                    <span className="text-base">
-                      {ev.type === 'yellow' ? '🟨' : '🟥'}
-                    </span>
-                  )}
-                  {ev.type === 'goal' && <span className="text-base leading-none">⚽</span>}
+                  <PlayerAvatar name={ev.player} />
+                  <span className="text-base leading-none">
+                    {ev.type === 'goal' ? '⚽' : ev.type === 'yellow' ? '🟨' : '🟥'}
+                  </span>
                   <span className="flex-1 text-[var(--text)]">
                     {shn(ev.player)} ({ev.tshort})
                   </span>
@@ -439,17 +435,13 @@ function LiveEventRow({
     txt = `Expulso — ${shn(ev.player)} (${ev.tshort})`;
   }
 
+  const showAvatar = ev.type === 'goal' || ev.type === 'yellow' || ev.type === 'red';
+
   return (
     <div className={cls}>
       <span className="min-w-[30px] text-sm font-bold text-[var(--text2)]">{ev.min}&apos;</span>
-      {ev.type === 'goal' ? (
-        <PlayerAvatar name={ev.player} />
-      ) : (
-        <span className="min-w-5 text-base">{icon}</span>
-      )}
-      {ev.type === 'goal' && (
-        <span className="min-w-5 text-base leading-none">⚽</span>
-      )}
+      {showAvatar && <PlayerAvatar name={ev.player} />}
+      <span className="min-w-5 text-base leading-none">{icon}</span>
       <span className="text-[var(--text)]">{txt}</span>
     </div>
   );
