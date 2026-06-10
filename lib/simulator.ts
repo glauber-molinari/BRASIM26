@@ -283,6 +283,8 @@ function generateSubEvents(
   [home, away].forEach((t, idx) => {
     const isHome = idx === 0;
     const tid = isHome ? homeId : awayId;
+    // Substituições automáticas apenas para o adversário — Meu Time é manual
+    if (tid === MY_TEAM_ID) return;
     const numSubs = rnd(1, 2);
     const nonGK = t.squad.filter((p) => p.p !== 'GK');
     if (!nonGK.length) return;

@@ -1,9 +1,17 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { TEAMS } from '@/data/teams';
 import { getPlayerPhoto } from '@/data/playerPhotos';
 import type { LineupSlot, Position, SelectedPlayer } from '@/lib/types';
 import TeamLogo from './TeamLogo';
+
+function matchesSearch(name: string, query: string): boolean {
+  if (!query.trim()) return true;
+  const norm = (s: string) =>
+    s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return norm(name).includes(norm(query.trim()));
+}
 
 interface SlotPickerProps {
   slotIdx: number;
@@ -28,6 +36,12 @@ export default function SlotPicker({
   onRemove,
   onClose,
 }: SlotPickerProps) {
+  const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    setSearch('');
+  }, [slotIdx, benchMode, swapMode]);
+
   const slot = benchMode || swapMode ? null : lineup[slotIdx];
 
   const usedKeys = new Set<string>();
@@ -43,11 +57,29 @@ export default function SlotPicker({
       ? 'Escalar Reserva'
       : `Escalar ${slot?.pos ?? ''}`;
 
+  const searchBar = (
+    <div className="border-b border-[var(--border)] px-4 py-3">
+      <input
+        type="search"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Buscar jogador..."
+        autoFocus
+        className="w-full rounded-lg border border-[var(--border2)] bg-[var(--bg3)] px-3 py-2 text-sm text-[var(--text)] placeholder:text-[var(--text3)] outline-none focus:border-[var(--green-light)]"
+      />
+    </div>
+  );
+
   // ── SWAP MODE: mostra apenas os 11 titulares + reservas já escalados ──
   if (swapMode) {
     const currentPlayer = lineup[slotIdx]?.player;
-    const starters = lineup.filter((s) => s.player).map((s) => s.player!);
-    const reserves = bench.filter((p): p is SelectedPlayer => p !== null);
+    const starters = lineup
+      .filter((s) => s.player)
+      .map((s) => s.player!)
+      .filter((p) => matchesSearch(p.n, search));
+    const reserves = bench
+      .filter((p): p is SelectedPlayer => p !== null)
+      .filter((p) => matchesSearch(p.n, search));
 
     return (
       <div
@@ -75,6 +107,8 @@ export default function SlotPicker({
               ✕
             </button>
           </div>
+
+          {searchBar}
 
           <div className="flex-1 overflow-y-auto px-4 py-2.5">
             {/* Titulares */}
@@ -166,7 +200,9 @@ export default function SlotPicker({
 
             {starters.length === 0 && reserves.length === 0 && (
               <div className="py-6 text-center text-sm text-[var(--text2)]">
-                Nenhum jogador escalado
+                {search.trim()
+                  ? 'Nenhum jogador encontrado'
+                  : 'Nenhum jogador escalado'}
               </div>
             )}
           </div>
@@ -176,6 +212,13 @@ export default function SlotPicker({
   }
 
   // ── MODO NORMAL (escalar / banco de reservas) ──
+  const filteredTeams = TEAMS.map((team) => {
+    const canAdd = (teamUsage[team.id] || 0) < 3;
+    const players = (benchMode ? team.squad : team.squad.filter((p) => p.p === slot!.pos))
+      .filter((p) => matchesSearch(p.n, search));
+    return { team, canAdd, players };
+  }).filter((entry) => entry.players.length > 0);
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
@@ -195,6 +238,8 @@ export default function SlotPicker({
           </button>
         </div>
 
+        {searchBar}
+
         <div className="flex-1 overflow-y-auto px-4 py-2.5">
           {(slot?.player || benchMode) && (
             <button
@@ -206,13 +251,13 @@ export default function SlotPicker({
             </button>
           )}
 
-          {TEAMS.map((team) => {
-            const canAdd = (teamUsage[team.id] || 0) < 3;
-            const players = benchMode
-              ? team.squad
-              : team.squad.filter((p) => p.p === slot!.pos);
-            if (!players.length) return null;
+          {filteredTeams.length === 0 && (
+            <div className="py-6 text-center text-sm text-[var(--text2)]">
+              {search.trim() ? 'Nenhum jogador encontrado' : 'Nenhum jogador disponível'}
+            </div>
+          )}
 
+          {filteredTeams.map(({ team, canAdd, players }) => {
             return (
               <div key={team.id}>
                 <div className="flex items-center gap-1 py-1.5 text-[9px] font-semibold uppercase tracking-wide text-[var(--text3)]">
