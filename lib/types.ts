@@ -33,14 +33,26 @@ export interface LineupSlot {
 
 export interface MatchEvent {
   min: number;
-  type: 'goal' | 'yellow' | 'red';
+  type: 'goal' | 'yellow' | 'red' | 'save' | 'post' | 'sub';
   team: 'home' | 'away';
-  player: string;
+  player: string;      // jogador que sai (em subs)
+  playerIn?: string;   // jogador que entra (em subs)
   tshort: string;
   isMy: boolean;
 }
 
+export interface MatchSegment {
+  evs: MatchEvent[];
+  hG: number;
+  aG: number;
+  hShots: number;
+  aShots: number;
+  hPoss: number;
+}
+
 export interface MatchResult {
+  seg1: MatchSegment;
+  seg2: MatchSegment;
   hG: number;
   aG: number;
   evs: MatchEvent[];
@@ -82,11 +94,11 @@ export type TacticKey = '4-4-2' | '4-3-3' | '4-5-1' | '3-5-2' | '5-3-2';
 
 export type GameStyle = 'normal' | 'contraAtaque' | 'retranca' | 'tikaTaka';
 
-export type SimSpeed = 700 | 250 | 60;
+export type SimSpeed = 2200 | 700 | 120;
 
 export type Screen = 'setup' | 'build' | 'sim' | 'result';
 
-export type LivePhase = 'pre' | 'live' | 'post';
+export type LivePhase = 'pre' | 'live1' | 'halftime' | 'live2' | 'post';
 
 export interface TeamData {
   id: number;

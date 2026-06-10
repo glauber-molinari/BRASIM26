@@ -7,6 +7,8 @@ import {
   genSchedule,
   initStandings,
   simMatch,
+  simMatchSegment,
+  buildMatchResult,
   updateStandings,
   getTeamDisplay,
   setMyTeam,
@@ -16,8 +18,10 @@ import type {
   GameStyle,
   LineupSlot,
   LivePhase,
+  MatchEvent,
   MatchHistoryEntry,
   MatchResult,
+  MatchSegment,
   Screen,
   SelectedPlayer,
   SimSpeed,
@@ -54,7 +58,7 @@ export default function Home() {
   const [matchHistory, setMatchHistory] = useState<MatchHistoryEntry[]>([]);
   const [playerGoals, setPlayerGoals] = useState<Record<string, number>>({});
   const [viewRound, setViewRound] = useState(0);
-  const [speed, setSpeed] = useState<SimSpeed>(250);
+  const [speed, setSpeed] = useState<SimSpeed>(700);
   const [running, setRunning] = useState(false);
   const [resumeRound, setResumeRound] = useState(0);
 
@@ -64,6 +68,8 @@ export default function Home() {
   const [liveRound, setLiveRound] = useState(1);
   const [liveHome, setLiveHome] = useState(0);
   const [liveAway, setLiveAway] = useState(0);
+  const [liveSeg1, setLiveSeg1] = useState<MatchSegment | null>(null);
+  const [liveSeg2, setLiveSeg2] = useState<MatchSegment | null>(null);
   const [liveResult, setLiveResult] = useState<MatchResult | null>(null);
   const [liveStandings, setLiveStandings] = useState<Standing[]>([]);
   const [liveRoundMatches, setLiveRoundMatches] = useState<StoredMatch[]>([]);
@@ -71,6 +77,11 @@ export default function Home() {
   const continueResolveRef = useRef<(() => void) | null>(null);
   const abortSimRef = useRef(false);
   const resumeRoundRef = useRef(0);
+  const liveResultRef = useRef<MatchResult | null>(null);
+  const standingsBeforeLiveRef = useRef<Standing[]>([]);
+  const seg1Ref = useRef<MatchSegment | null>(null);
+  const seg2Ref = useRef<MatchSegment | null>(null);
+  const userSubEventsRef = useRef<MatchEvent[]>([]);
 
   const stepIndex = screen === 'setup' ? 1 : screen === 'build' ? 2 : screen === 'sim' ? 3 : 4;
 
@@ -121,12 +132,18 @@ export default function Home() {
   };
 
   const waitForMatch = useCallback(
-    (hId: number, aId: number, round: number, result: MatchResult) =>
+    (hId: number, aId: number, round: number) =>
       new Promise<void>((resolve) => {
+        seg1Ref.current = null;
+        seg2Ref.current = null;
+        liveResultRef.current = null;
+        userSubEventsRef.current = [];
         setLiveHome(hId);
         setLiveAway(aId);
         setLiveRound(round);
-        setLiveResult(result);
+        setLiveSeg1(null);
+        setLiveSeg2(null);
+        setLiveResult(null);
         setLivePhase('pre');
         setLiveVisible(true);
         setPendingLive(true);
@@ -135,12 +152,76 @@ export default function Home() {
     []
   );
 
-  const handleLivePlay = () => {
-    setLivePhase('live');
-  };
+  // Usuário clica "Jogar Partida" — gera apenas o 1º tempo
+  const handleLivePlay = useCallback(() => {
+    const seg1 = simMatchSegment(liveHome, liveAway, lineup, gameStyle, 0, 45);
+    seg1Ref.current = seg1;
+    setLiveSeg1(seg1);
+    setLivePhase('live1');
+  }, [liveHome, liveAway, lineup, gameStyle]);
 
+  // Animação do 1º tempo terminou → abre painel de intervalo
+  const handleHalftimeReady = useCallback(() => {
+    setLivePhase('halftime');
+  }, []);
+
+  // Usuário clica "Iniciar 2º Tempo" → gera 2º tempo com lineup/estilo atual
+  const handleSecondHalfStart = useCallback(() => {
+    const seg2 = simMatchSegment(liveHome, liveAway, lineup, gameStyle, 46, 94);
+    seg2Ref.current = seg2;
+    setLiveSeg2(seg2);
+    setLivePhase('live2');
+  }, [liveHome, liveAway, lineup, gameStyle]);
+
+  // Animação do 2º tempo terminou → constrói resultado final e atualiza tabela
   const handleLiveComplete = useCallback(() => {
+    const s1 = seg1Ref.current;
+    const s2 = seg2Ref.current;
+    if (s1 && s2) {
+      const result = buildMatchResult(s1, s2);
+      if (userSubEventsRef.current.length) {
+        result.evs = [...result.evs, ...userSubEventsRef.current].sort((a, b) => a.min - b.min);
+      }
+      liveResultRef.current = result;
+      setLiveResult(result);
+      if (standingsBeforeLiveRef.current.length > 0) {
+        setLiveStandings(
+          updateStandings(standingsBeforeLiveRef.current, liveHome, liveAway, result.hG, result.aG)
+        );
+      }
+    }
     setLivePhase('post');
+  }, [liveHome, liveAway]);
+
+  // Substituição durante live/intervalo
+  const handleLiveSubstitute = useCallback(
+    (slotIdx: number, newPlayer: SelectedPlayer, outPlayer: SelectedPlayer, minute: number) => {
+      setLineup((prev) => prev.map((s, i) => (i === slotIdx ? { ...s, player: newPlayer } : s)));
+      const isMyHome = liveHome === MY_TEAM_ID;
+      userSubEventsRef.current = [
+        ...userSubEventsRef.current,
+        {
+          min: minute,
+          type: 'sub',
+          team: isMyHome ? 'home' : 'away',
+          player: outPlayer.n,
+          playerIn: newPlayer.n,
+          tshort: outPlayer.ts,
+          isMy: true,
+        },
+      ];
+    },
+    [liveHome],
+  );
+
+  // Mudança de formação durante live/intervalo
+  const handleLiveChangeTactic = useCallback((t: string) => {
+    setTactic(t as TacticKey);
+  }, []);
+
+  // Mudança de estilo durante live/intervalo
+  const handleLiveChangeStyle = useCallback((style: GameStyle) => {
+    setGameStyle(style);
   }, []);
 
   const handleLiveContinue = () => {
@@ -275,16 +356,19 @@ export default function Home() {
       for (const [hId, aId] of pairs) {
         if (hId !== MY_TEAM_ID && aId !== MY_TEAM_ID) continue;
 
-        const res = simMatch(hId, aId, lineup, gameStyle);
-        const standingsAfterMatch = updateStandings(currentStandings, hId, aId, res.hG, res.aG);
-        setLiveStandings(standingsAfterMatch);
+        standingsBeforeLiveRef.current = currentStandings;
         setLiveRoundMatches(roundOtherMatches);
-        await waitForMatch(hId, aId, r + 1, res);
+        await waitForMatch(hId, aId, r + 1);
 
         if (abortSimRef.current) {
           setRunning(false);
           return;
         }
+
+        const res = liveResultRef.current;
+        if (!res) { setRunning(false); return; }
+
+        const standingsAfterMatch = updateStandings(currentStandings, hId, aId, res.hG, res.aG);
 
         currentMatches = [
           ...currentMatches,
@@ -466,15 +550,25 @@ export default function Home() {
         round={liveRound}
         homeId={liveHome}
         awayId={liveAway}
+        seg1={liveSeg1}
+        seg2={liveSeg2}
         result={liveResult}
         speed={speed}
         lineup={lineup}
+        bench={bench}
+        currentTactic={tactic}
+        currentStyle={gameStyle}
         onPlay={handleLivePlay}
+        onHalftimeReady={handleHalftimeReady}
+        onSecondHalfStart={handleSecondHalfStart}
         onLiveComplete={handleLiveComplete}
         onContinue={handleLiveContinue}
         onReset={handleLiveReset}
         onEditLineup={handleLiveEditLineup}
         onDismiss={handleLiveDismiss}
+        onSubstitute={handleLiveSubstitute}
+        onChangeTactic={handleLiveChangeTactic}
+        onChangeStyle={handleLiveChangeStyle}
         standings={liveStandings}
         roundMatches={liveRoundMatches}
       />

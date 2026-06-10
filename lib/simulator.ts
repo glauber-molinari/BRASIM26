@@ -5,6 +5,7 @@ import type {
   LineupStrength,
   MatchEvent,
   MatchResult,
+  MatchSegment,
   Player,
   Standing,
   TeamData,
@@ -189,12 +190,137 @@ const POSS_RANGE: Record<GameStyle, [number, number]> = {
   tikaTaka:     [55, 70],
 };
 
-export function simMatch(
+// ─── Gera eventos de gol para um segmento ───
+function generateGoalEvents(
+  team: TeamData,
+  teamId: number,
+  side: 'home' | 'away',
+  count: number,
+  getMins: (n: number) => number[],
+): MatchEvent[] {
+  const scored = new Set<string>();
+  return getMins(count).map((min) => {
+    const sc = pickScorer(team.squad, scored);
+    scored.add(sc.n);
+    return {
+      min,
+      type: 'goal' as const,
+      team: side,
+      player: sc.n,
+      tshort: team.short,
+      isMy: teamId === MY_TEAM_ID,
+    };
+  });
+}
+
+// ─── Gera defesas do goleiro ───
+function generateSaveEvents(
+  home: TeamData,
+  away: TeamData,
+  homeId: number,
+  awayId: number,
+  count: number,
+  getMins: (n: number) => number[],
+): MatchEvent[] {
+  const events: MatchEvent[] = [];
+  for (const min of getMins(count)) {
+    const isHomeGkSaving = Math.random() > 0.5;
+    const savingTeam = isHomeGkSaving ? home : away;
+    const savingTeamId = isHomeGkSaving ? homeId : awayId;
+    const gk = savingTeam.squad.find((p) => p.p === 'GK') ?? savingTeam.squad[0];
+    if (!gk) continue; // squad vazio — pula o evento
+    events.push({
+      min,
+      type: 'save' as const,
+      team: isHomeGkSaving ? 'home' : 'away',
+      player: gk.n,
+      tshort: savingTeam.short,
+      isMy: savingTeamId === MY_TEAM_ID,
+    });
+  }
+  return events;
+}
+
+// ─── Gera chutes na trave ───
+function generatePostEvents(
+  home: TeamData,
+  away: TeamData,
+  homeId: number,
+  awayId: number,
+  getMins: (n: number) => number[],
+): MatchEvent[] {
+  if (Math.random() >= 0.22) return [];
+  const mins = getMins(1);
+  if (!mins.length) return [];
+  const isHome = Math.random() > 0.5;
+  const t = isHome ? home : away;
+  const tid = isHome ? homeId : awayId;
+  const shooter = pickScorer(t.squad, new Set());
+  return [{
+    min: mins[0],
+    type: 'post' as const,
+    team: isHome ? 'home' : 'away',
+    player: shooter.n,
+    tshort: t.short,
+    isMy: tid === MY_TEAM_ID,
+  }];
+}
+
+// ─── Gera substituições ───
+function generateSubEvents(
+  home: TeamData,
+  away: TeamData,
+  homeId: number,
+  awayId: number,
+  fromMin: number,
+  toMin: number,
+  getMins: (n: number) => number[],
+): MatchEvent[] {
+  if (toMin < 55) return [];
+  const subFromMin = Math.max(fromMin, 55);
+
+  const evs: MatchEvent[] = [];
+  [home, away].forEach((t, idx) => {
+    const isHome = idx === 0;
+    const tid = isHome ? homeId : awayId;
+    const numSubs = rnd(1, 2);
+    const nonGK = t.squad.filter((p) => p.p !== 'GK');
+    if (!nonGK.length) return;
+    const subMins: number[] = [];
+    for (let i = 0; i < numSubs; i++) {
+      subMins.push(rnd(subFromMin, Math.min(toMin - 2, 88)));
+    }
+    subMins.sort((a, b) => a - b);
+    subMins.forEach((min) => {
+      const outPlayer = nonGK[rnd(0, nonGK.length - 1)];
+      const inPool = nonGK.filter((p) => p.n !== outPlayer.n);
+      const inPlayer = inPool.length ? inPool[rnd(0, inPool.length - 1)] : outPlayer;
+      evs.push({
+        min,
+        type: 'sub' as const,
+        team: isHome ? 'home' : 'away',
+        player: outPlayer.n,
+        playerIn: inPlayer.n,
+        tshort: t.short,
+        isMy: tid === MY_TEAM_ID,
+      });
+    });
+  });
+
+  // Adiciona ao pool de minutos usados
+  getMins(0);
+  return evs;
+}
+
+// ─── Simula um segmento de tempo (1º ou 2º) ───
+export function simMatchSegment(
   homeId: number,
   awayId: number,
   lineup: LineupSlot[],
-  gameStyle: GameStyle = 'normal'
-): MatchResult {
+  gameStyle: GameStyle,
+  fromMin: number,
+  toMin: number,
+): MatchSegment {
   const home = getTeamData(homeId, lineup);
   const away = getTeamData(awayId, lineup);
 
@@ -206,8 +332,9 @@ export function simMatch(
   const hAttMult = isMyHome ? mult.my : isMyAway ? mult.opp : 1;
   const aAttMult = isMyAway ? mult.my : isMyHome ? mult.opp : 1;
 
-  const hXG = teamXG(home.att * hAttMult, away.def, HOME_ADV);
-  const aXG = teamXG(away.att * aAttMult, home.def);
+  const timeFraction = (toMin - fromMin) / 94;
+  const hXG = teamXG(home.att * hAttMult, away.def, HOME_ADV) * timeFraction;
+  const aXG = teamXG(away.att * aAttMult, home.def) * timeFraction;
 
   const hG = poissonSample(hXG);
   const aG = poissonSample(aXG);
@@ -215,56 +342,69 @@ export function simMatch(
   const used = new Set<number>();
   const getMins = (n: number): number[] => {
     const m: number[] = [];
-    while (m.length < n) {
-      const v = rnd(3, 94);
-      if (!used.has(v)) {
-        used.add(v);
-        m.push(v);
-      }
+    let attempts = 0;
+    while (m.length < n && attempts < 200) {
+      const v = rnd(fromMin + 1, toMin);
+      if (!used.has(v)) { used.add(v); m.push(v); }
+      attempts++;
     }
     return m.sort((a, b) => a - b);
   };
 
-  const evs: MatchEvent[] = [];
-
-  const homeScored = new Set<string>();
-  getMins(hG).forEach((min) => {
-    const sc = pickScorer(home.squad, homeScored);
-    homeScored.add(sc.n);
-    evs.push({
-      min,
-      type: 'goal',
-      team: 'home',
-      player: sc.n,
-      tshort: home.short,
-      isMy: homeId === MY_TEAM_ID,
-    });
-  });
-
-  const awayScored = new Set<string>();
-  getMins(aG).forEach((min) => {
-    const sc = pickScorer(away.squad, awayScored);
-    awayScored.add(sc.n);
-    evs.push({
-      min,
-      type: 'goal',
-      team: 'away',
-      player: sc.n,
-      tshort: away.short,
-      isMy: awayId === MY_TEAM_ID,
-    });
-  });
+  const evs: MatchEvent[] = [
+    ...generateGoalEvents(home, homeId, 'home', hG, getMins),
+    ...generateGoalEvents(away, awayId, 'away', aG, getMins),
+    ...generateSaveEvents(home, away, homeId, awayId, rnd(1, 3), getMins),
+    ...generatePostEvents(home, away, homeId, awayId, getMins),
+    ...generateSubEvents(home, away, homeId, awayId, fromMin, toMin, getMins),
+  ];
 
   addMatchCards(evs, home, away, homeId, awayId, used);
 
   evs.sort((a, b) => a.min - b.min);
 
-  const hShots = rnd(8, 18);
-  const aShots = rnd(6, 16);
+  const segTimeFrac = timeFraction;
   const [possMin, possMax] = POSS_RANGE[style];
-  const hPoss = isMyHome ? rnd(possMin, possMax) : isMyAway ? 100 - rnd(possMin, possMax) : rnd(42, 62);
+  const hPoss = isMyHome
+    ? rnd(possMin, possMax)
+    : isMyAway
+    ? 100 - rnd(possMin, possMax)
+    : rnd(42, 62);
 
-  return { hG, aG, evs, hShots, aShots, hPoss };
+  return {
+    evs,
+    hG,
+    aG,
+    hShots: rnd(Math.round(4 * segTimeFrac), Math.round(10 * segTimeFrac)),
+    aShots: rnd(Math.round(3 * segTimeFrac), Math.round(8 * segTimeFrac)),
+    hPoss,
+  };
+}
+
+// ─── Monta MatchResult a partir dos 2 segmentos ───
+export function buildMatchResult(seg1: MatchSegment, seg2: MatchSegment): MatchResult {
+  return {
+    seg1,
+    seg2,
+    hG: seg1.hG + seg2.hG,
+    aG: seg1.aG + seg2.aG,
+    evs: [...seg1.evs, ...seg2.evs].sort((a, b) => a.min - b.min),
+    hShots: seg1.hShots + seg2.hShots,
+    aShots: seg1.aShots + seg2.aShots,
+    hPoss: Math.round((seg1.hPoss + seg2.hPoss) / 2),
+  };
+}
+
+// ─── Compatibilidade: simula partida completa (rodadas sem Meu Time) ───
+export function simMatch(
+  homeId: number,
+  awayId: number,
+  lineup: LineupSlot[],
+  gameStyle: GameStyle = 'normal',
+): MatchResult {
+  const seg1 = simMatchSegment(homeId, awayId, lineup, gameStyle, 0, 45);
+  const seg2 = simMatchSegment(homeId, awayId, lineup, gameStyle, 46, 94);
+  return buildMatchResult(seg1, seg2);
 }
 
 export function genSchedule(): [number, number][][] {

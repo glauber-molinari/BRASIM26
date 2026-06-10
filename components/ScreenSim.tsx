@@ -1,8 +1,9 @@
 'use client';
 
-import { MY_TEAM_ID, MY_TEAM_EMOJI } from '@/data/teams';
+import { MY_TEAM_ID, MY_TEAM_EMOJI, PLAYER_PHOTO_MAP } from '@/data/teams';
 import { getTeamDisplay } from '@/lib/simulator';
 import { shn } from '@/lib/helpers';
+import { getPlayerPhoto } from '@/data/playerPhotos';
 import type { LineupSlot, SimSpeed, StoredMatch } from '@/lib/types';
 import StandingsTable from './StandingsTable';
 import TeamLogo from './TeamLogo';
@@ -74,9 +75,9 @@ export default function ScreenSim({
             onChange={(e) => onSpeedChange(Number(e.target.value) as SimSpeed)}
             className="rounded-lg border border-[var(--border2)] bg-[var(--bg3)] px-2 py-2 text-sm text-[var(--text)] sm:px-3"
           >
-            <option value={700}>Normal</option>
-            <option value={250}>Rápido</option>
-            <option value={60}>Ultra</option>
+            <option value={2200}>Normal (~3 min)</option>
+            <option value={700}>Rápido</option>
+            <option value={120}>Ultra</option>
           </select>
           <button type="button" onClick={onStart} disabled={running} className="btn-primary px-3 py-2 text-sm sm:px-4">
             ▶ Iniciar
@@ -183,10 +184,12 @@ export default function ScreenSim({
               .map((s, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-2 border-b border-[var(--border)] py-1.5 text-sm last:border-0"
+                  className="flex items-center gap-2 border-b border-[var(--border)] py-1.5 last:border-0"
                 >
-                  <span className="text-xs">{s.player!.tc}</span>
-                  <span className="flex-1 text-[var(--text)]">{s.player!.n}</span>
+                  <PlayerAvatar name={s.player!.n} />
+                  <span className="flex-1 truncate text-sm text-[var(--text)]">
+                    {shn(s.player!.n)}
+                  </span>
                   <span className={`pl-pbadge pos-${s.pos} text-[9px]`}>{s.pos}</span>
                   {(playerGoals[s.player!.n] ?? 0) > 0 && (
                     <span className="text-[11px] font-semibold text-[var(--green-light)]">
@@ -207,5 +210,29 @@ export default function ScreenSim({
         </div>
       </div>
     </>
+  );
+}
+
+function PlayerAvatar({ name }: { name: string }) {
+  const photo = PLAYER_PHOTO_MAP[name] ?? getPlayerPhoto(name);
+  const initials = name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join('');
+
+  return (
+    <div className="relative flex h-7 w-7 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/10 text-[9px] font-bold text-white">
+      <span>{initials}</span>
+      {photo && (
+        <img
+          src={photo}
+          alt={name}
+          className="absolute inset-0 h-full w-full object-cover object-top"
+          onError={(e) => { e.currentTarget.style.display = 'none'; }}
+        />
+      )}
+    </div>
   );
 }
