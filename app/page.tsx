@@ -99,12 +99,14 @@ export default function Home() {
       setLineup(rolled.lineup);
       setTeamUsage(rolled.teamUsage);
       setActiveTeamTab(rolled.firstTeamTab);
+      setBench(rolled.bench);
       setDiceSpinning(false);
     }, 600);
   };
 
   const handleStart = () => {
     if (lineup.filter((s) => s.player).length < 11) return;
+    if (bench.filter(Boolean).length < 5) return;
     const sched = genSchedule();
     setSchedule(sched);
     setStandings(initStandings(sched));
@@ -347,7 +349,7 @@ export default function Home() {
         className="flex flex-col border-b border-[var(--border2)]"
         style={{ background: 'linear-gradient(135deg, var(--green-dark), var(--bg) 60%)' }}
       >
-        <div className="flex items-center justify-center gap-1.5 border-b border-[var(--border2)]/40 px-4 py-1.5 text-center text-xs text-[var(--text2)]">
+        <div className="flex items-center justify-center gap-1.5 border-b border-[var(--border2)]/40 px-5 py-1.5 text-center text-sm text-[var(--text2)]">
           <span>⚽ Jogue Grátis</span>
           <span className="text-[var(--border2)]">·</span>
           <span>

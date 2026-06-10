@@ -45,6 +45,7 @@ export function applyTactic(
 export function rollRandomLineup(): {
   tactic: TacticKey;
   lineup: LineupSlot[];
+  bench: (SelectedPlayer | null)[];
   teamUsage: Record<number, number>;
   firstTeamTab: number;
 } {
@@ -54,6 +55,7 @@ export function rollRandomLineup(): {
   const teamUsage: Record<number, number> = {};
   let firstTeamTab = 0;
 
+  // Roll 11 starters
   lineup.forEach((slot, i) => {
     const candidates: { team: (typeof TEAMS)[0]; player: (typeof TEAMS)[0]['squad'][0] }[] = [];
     TEAMS.forEach((team) => {
@@ -87,5 +89,48 @@ export function rollRandomLineup(): {
     }
   });
 
-  return { tactic, lineup, teamUsage, firstTeamTab };
+  // Roll 5 bench players: 1 GK, 1 DF, 1 MF, 1 MF, 1 FW
+  const benchPositions: Position[] = ['GK', 'DF', 'MF', 'MF', 'FW'];
+  const benchPlayers: SelectedPlayer[] = [];
+
+  benchPositions.forEach((pos) => {
+    const candidates: { team: (typeof TEAMS)[0]; player: (typeof TEAMS)[0]['squad'][0] }[] = [];
+    TEAMS.forEach((team) => {
+      team.squad
+        .filter((p) => p.p === pos)
+        .forEach((player) => candidates.push({ team, player }));
+    });
+
+    let attempts = 0;
+    while (attempts < 200) {
+      const pick = candidates[rnd(0, candidates.length - 1)];
+      const used = teamUsage[pick.team.id] || 0;
+      const alreadyInLineup = lineup.some(
+        (s) => s.player?.n === pick.player.n && s.player?.tid === pick.team.id
+      );
+      const alreadyInBench = benchPlayers.some(
+        (p) => p.n === pick.player.n && p.tid === pick.team.id
+      );
+      if (used < 3 && !alreadyInLineup && !alreadyInBench) {
+        benchPlayers.push({
+          n: pick.player.n,
+          p: pos,
+          tid: pick.team.id,
+          tc: pick.team.c,
+          tl: pick.team.logo,
+          tn: pick.team.name,
+          ts: pick.team.short,
+        });
+        teamUsage[pick.team.id] = used + 1;
+        break;
+      }
+      attempts++;
+    }
+  });
+
+  // Pad to 5 slots with null if needed
+  const bench: (SelectedPlayer | null)[] = [...benchPlayers];
+  while (bench.length < 5) bench.push(null);
+
+  return { tactic, lineup, bench, teamUsage, firstTeamTab };
 }

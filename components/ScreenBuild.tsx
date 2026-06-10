@@ -210,7 +210,7 @@ export default function ScreenBuild({
           <p className="section-sub">
             {isContinuing
               ? `Campeonato em andamento · Rodada ${currentRound}/38`
-              : 'Máx. 3 jogadores por time · Complete 11 titulares · Escolha a tática'}
+              : 'Máx. 3 jogadores por time · 11 titulares + 5 reservas · Escolha a tática'}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -237,7 +237,7 @@ export default function ScreenBuild({
               <span className="sm:hidden">R.{currentRound} →</span>
             </button>
           ) : (
-            <button type="button" onClick={onStart} disabled={count < 11} className="btn-primary text-sm sm:text-base">
+            <button type="button" onClick={onStart} disabled={count < 11 || bench.filter(Boolean).length < 5} className="btn-primary text-sm sm:text-base">
               <span className="hidden sm:inline">Simular Campeonato →</span>
               <span className="sm:hidden">Simular →</span>
             </button>
