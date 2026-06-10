@@ -87,6 +87,9 @@ export default function ScreenBuild({
   const byPos: Record<Position, typeof team.squad> = { GK: [], DF: [], MF: [], FW: [] };
   team.squad.forEach((p) => byPos[p.p].push(p));
 
+  const photoFor = (tid: number, name: string) =>
+    TEAMS.find((x) => x.id === tid)?.squad.find((p) => p.n === name)?.photo;
+
   const togglePlayer = (tid: number, name: string, pos: Position) => {
     const existIdx = lineup.findIndex(
       (s) => s.player?.n === name && s.player?.tid === tid
@@ -109,7 +112,16 @@ export default function ScreenBuild({
         i === emptyIdx
           ? {
               ...s,
-              player: { n: name, p: pos, tid, tc: t.c, tl: t.logo, tn: t.name, ts: t.short },
+              player: {
+                n: name,
+                p: pos,
+                photo: photoFor(tid, name),
+                tid,
+                tc: t.c,
+                tl: t.logo,
+                tn: t.name,
+                ts: t.short,
+              },
             }
           : s
       );
@@ -165,7 +177,19 @@ export default function ScreenBuild({
     const t = TEAMS.find((x) => x.id === tid)!;
     const newLineup = lineup.map((s, i) =>
       i === pickerIdx
-        ? { ...s, player: { n: name, p: pos, tid, tc: t.c, tl: t.logo, tn: t.name, ts: t.short } }
+        ? {
+            ...s,
+            player: {
+              n: name,
+              p: pos,
+              photo: photoFor(tid, name),
+              tid,
+              tc: t.c,
+              tl: t.logo,
+              tn: t.name,
+              ts: t.short,
+            },
+          }
         : s
     );
     usage[tid] = (usage[tid] || 0) + 1;
@@ -189,7 +213,16 @@ export default function ScreenBuild({
     const t = TEAMS.find((x) => x.id === tid)!;
     const newBench = bench.map((p, i) =>
       i === benchPickerIdx
-        ? { n: name, p: pos, tid, tc: t.c, tl: t.logo, tn: t.name, ts: t.short }
+        ? {
+            n: name,
+            p: pos,
+            photo: photoFor(tid, name),
+            tid,
+            tc: t.c,
+            tl: t.logo,
+            tn: t.name,
+            ts: t.short,
+          }
         : p
     );
     onBenchChange(newBench);
@@ -295,7 +328,17 @@ export default function ScreenBuild({
                         }
                         className={`player-row ${inLU ? 'player-row-selected' : ''} ${dis ? 'player-row-disabled' : ''}`}
                       >
-                        <span className={`pl-pbadge pos-${pos}`}>{pos}</span>
+                        <div className="relative flex h-7 w-7 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--bg3)]">
+                          <span className={`pl-pbadge pos-${pos} text-[9px] font-bold`}>{pos}</span>
+                          {p.photo && (
+                            <img
+                              src={p.photo}
+                              alt={p.n}
+                              className="absolute inset-0 h-full w-full object-cover object-top"
+                              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                            />
+                          )}
+                        </div>
                         <span className="flex-1 text-base text-[var(--text)]">{p.n}</span>
                         <span
                           className={`flex h-5 w-5 items-center justify-center rounded-full border-2 text-[10px] font-bold ${

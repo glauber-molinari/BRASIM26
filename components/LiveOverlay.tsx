@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { MY_TEAM_ID } from '@/data/teams';
+import { MY_TEAM_ID, PLAYER_PHOTO_MAP } from '@/data/teams';
 import { LIVE_MINUTES, getMyTeamData, getTeamDisplay } from '@/lib/simulator';
 import { shn, sleep } from '@/lib/helpers';
+import { getPlayerPhoto } from '@/data/playerPhotos';
 import type { LineupSlot, LivePhase, MatchEvent, MatchResult, Standing, StoredMatch } from '@/lib/types';
 import OverlayStandings from './OverlayStandings';
 import TeamLogo from './TeamLogo';
@@ -297,9 +298,14 @@ export default function LiveOverlay({
                   <span className="min-w-[32px] rounded-md bg-[var(--bg3)] px-1.5 py-0.5 text-center text-xs font-bold text-[var(--text)]">
                     {ev.min}&apos;
                   </span>
-                  <span className="text-base">
-                    {ev.type === 'goal' ? '⚽' : ev.type === 'yellow' ? '🟨' : '🟥'}
-                  </span>
+                  {ev.type === 'goal' ? (
+                    <PlayerAvatar name={ev.player} />
+                  ) : (
+                    <span className="text-base">
+                      {ev.type === 'yellow' ? '🟨' : '🟥'}
+                    </span>
+                  )}
+                  {ev.type === 'goal' && <span className="text-base leading-none">⚽</span>}
                   <span className="flex-1 text-[var(--text)]">
                     {shn(ev.player)} ({ev.tshort})
                   </span>
@@ -378,6 +384,30 @@ export default function LiveOverlay({
   );
 }
 
+function PlayerAvatar({ name }: { name: string }) {
+  const photo = PLAYER_PHOTO_MAP[name] ?? getPlayerPhoto(name);
+  const initials = name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join('');
+
+  return (
+    <div className="relative flex h-7 w-7 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/10 text-[9px] font-bold text-white">
+      <span>{initials}</span>
+      {photo && (
+        <img
+          src={photo}
+          alt={name}
+          className="absolute inset-0 h-full w-full object-cover object-top"
+          onError={(e) => { e.currentTarget.style.display = 'none'; }}
+        />
+      )}
+    </div>
+  );
+}
+
 function LiveEventRow({
   ev,
   homeId,
@@ -412,7 +442,14 @@ function LiveEventRow({
   return (
     <div className={cls}>
       <span className="min-w-[30px] text-sm font-bold text-[var(--text2)]">{ev.min}&apos;</span>
-      <span className="min-w-5 text-base">{icon}</span>
+      {ev.type === 'goal' ? (
+        <PlayerAvatar name={ev.player} />
+      ) : (
+        <span className="min-w-5 text-base">{icon}</span>
+      )}
+      {ev.type === 'goal' && (
+        <span className="min-w-5 text-base leading-none">⚽</span>
+      )}
       <span className="text-[var(--text)]">{txt}</span>
     </div>
   );

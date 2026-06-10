@@ -98,13 +98,13 @@ export default function SlotPicker({
                           : 'cursor-pointer bg-transparent hover:bg-white/5'
                       }`}
                     >
-                      <div className="relative flex h-7 w-7 flex-shrink-0 items-center justify-center overflow-hidden rounded-full">
+                      <div className="relative flex h-7 w-7 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--bg3)]">
                         <span className={`pl-pbadge pos-${p.p} text-[9px] font-bold`}>
                           {p.p}
                         </span>
-                        {getPlayerPhoto(p.n) && (
+                        {(p.photo ?? getPlayerPhoto(p.n)) && (
                           <img
-                            src={getPlayerPhoto(p.n)}
+                            src={p.photo ?? getPlayerPhoto(p.n)}
                             alt={p.n}
                             className="absolute inset-0 h-full w-full object-cover object-top"
                             onError={(e) => {
@@ -139,13 +139,13 @@ export default function SlotPicker({
                     onClick={() => onPick(p.tid, p.n, p.p)}
                     className="mb-0.5 flex w-full cursor-pointer items-center gap-1.5 rounded-md border-none bg-transparent px-2 py-1.5 text-left transition-colors hover:bg-white/5"
                   >
-                    <div className="relative flex h-7 w-7 flex-shrink-0 items-center justify-center overflow-hidden rounded-full">
+                    <div className="relative flex h-7 w-7 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--bg3)]">
                       <span className={`pl-pbadge pos-${p.p} text-[9px] font-bold`}>
                         {p.p}
                       </span>
-                      {getPlayerPhoto(p.n) && (
+                      {(p.photo ?? getPlayerPhoto(p.n)) && (
                         <img
-                          src={getPlayerPhoto(p.n)}
+                          src={p.photo ?? getPlayerPhoto(p.n)}
                           alt={p.n}
                           className="absolute inset-0 h-full w-full object-cover object-top"
                           onError={(e) => {
@@ -242,13 +242,13 @@ export default function SlotPicker({
                           : 'cursor-pointer hover:bg-white/5'
                       } ${isCur ? 'bg-[rgba(20,163,82,0.14)]' : 'bg-transparent'}`}
                     >
-                      <div className="relative flex h-7 w-7 flex-shrink-0 items-center justify-center overflow-hidden rounded-full">
+                      <div className="relative flex h-7 w-7 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--bg3)]">
                         <span className={`pl-pbadge pos-${p.p} text-[9px] font-bold`}>
                           {p.p}
                         </span>
-                        {getPlayerPhoto(p.n) && (
+                        {(p.photo ?? getPlayerPhoto(p.n)) && (
                           <img
-                            src={getPlayerPhoto(p.n)}
+                            src={p.photo ?? getPlayerPhoto(p.n)}
                             alt={p.n}
                             className="absolute inset-0 h-full w-full object-cover object-top"
                             onError={(e) => {

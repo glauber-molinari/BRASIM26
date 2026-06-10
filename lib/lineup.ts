@@ -75,6 +75,7 @@ export function rollRandomLineup(): {
         slot.player = {
           n: pick.player.n,
           p: slot.pos,
+          photo: pick.player.photo,
           tid: pick.team.id,
           tc: pick.team.c,
           tl: pick.team.logo,
@@ -115,6 +116,7 @@ export function rollRandomLineup(): {
         benchPlayers.push({
           n: pick.player.n,
           p: pos,
+          photo: pick.player.photo,
           tid: pick.team.id,
           tc: pick.team.c,
           tl: pick.team.logo,

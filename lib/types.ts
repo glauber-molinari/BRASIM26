@@ -3,6 +3,7 @@ export type Position = 'GK' | 'DF' | 'MF' | 'FW';
 export interface Player {
   n: string;
   p: Position;
+  photo?: string;
 }
 
 export interface Team {

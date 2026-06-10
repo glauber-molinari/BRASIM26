@@ -55,9 +55,9 @@ export default function PitchBuilder({ lineup, onSlotClick }: PitchBuilderProps)
                       <span className="text-[9px] font-bold leading-none text-[#1a5e2a]">
                         {ini(slot.player.n)}
                       </span>
-                      {getPlayerPhoto(slot.player.n) && (
+                      {(slot.player.photo ?? getPlayerPhoto(slot.player.n)) && (
                         <img
-                          src={getPlayerPhoto(slot.player.n)}
+                          src={slot.player.photo ?? getPlayerPhoto(slot.player.n)}
                           alt={slot.player.n}
                           className="absolute inset-0 h-full w-full object-cover object-top"
                           onError={(e) => { e.currentTarget.style.display = 'none'; }}

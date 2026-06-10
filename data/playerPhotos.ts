@@ -542,3 +542,9 @@ export function getPlayerPhoto(name: string): string | undefined {
   const path = PLAYER_PHOTOS[name];
   return path ? withBasePath(path) : undefined;
 }
+
+/** Retorna a melhor foto disponível: prefere URL direta (api-sports.io), cai para Transfermarkt */
+export function getPhotoByName(name: string, directPhoto?: string): string | undefined {
+  if (directPhoto) return directPhoto;
+  return getPlayerPhoto(name);
+}
