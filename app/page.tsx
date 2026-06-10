@@ -365,42 +365,42 @@ export default function Home() {
           </span>
         </div>
 
-        <div className="flex items-center gap-3 px-6 py-4">
-        <span className="text-2xl">⚽</span>
-        <h1 className="font-condensed text-3xl font-black uppercase tracking-wide text-white">
-          BRA<span className="text-[var(--green-light)]">26</span>
-        </h1>
-        <div className="ml-auto flex items-center gap-3 text-sm">
-          {STEPS.map((s, i) => (
-            <span key={s.id} className="flex items-center gap-2">
-              {i > 0 && <span className="text-[var(--border2)]">›</span>}
-              <span
-                className={`flex items-center gap-1.5 transition-colors ${
-                  i + 1 < stepIndex
-                    ? 'text-[var(--text3)]'
-                    : i + 1 === stepIndex
-                      ? 'text-[var(--green-light)]'
-                      : 'text-[var(--text3)]'
-                }`}
-              >
+        <div className="flex items-center gap-2 px-3 py-3 sm:gap-3 sm:px-6 sm:py-4">
+          <span className="text-xl sm:text-2xl">⚽</span>
+          <h1 className="font-condensed text-xl font-black uppercase tracking-wide text-white sm:text-3xl">
+            BRA<span className="text-[var(--green-light)]">26</span>
+          </h1>
+          <div className="ml-auto flex items-center gap-1.5 sm:gap-3">
+            {STEPS.map((s, i) => (
+              <span key={s.id} className="flex items-center gap-1 sm:gap-2">
+                {i > 0 && <span className="text-[var(--border2)]">›</span>}
                 <span
-                  className={`h-[7px] w-[7px] rounded-full border ${
+                  className={`flex items-center gap-1 transition-colors sm:gap-1.5 ${
                     i + 1 < stepIndex
-                      ? 'border-[var(--green)] bg-[var(--green-dark)]'
+                      ? 'text-[var(--text3)]'
                       : i + 1 === stepIndex
-                        ? 'border-[var(--green-light)] bg-[var(--green-light)]'
-                        : 'border-[var(--border2)] bg-[var(--bg3)]'
+                        ? 'text-[var(--green-light)]'
+                        : 'text-[var(--text3)]'
                   }`}
-                />
-                {s.label}
+                >
+                  <span
+                    className={`h-[7px] w-[7px] shrink-0 rounded-full border ${
+                      i + 1 < stepIndex
+                        ? 'border-[var(--green)] bg-[var(--green-dark)]'
+                        : i + 1 === stepIndex
+                          ? 'border-[var(--green-light)] bg-[var(--green-light)]'
+                          : 'border-[var(--border2)] bg-[var(--bg3)]'
+                    }`}
+                  />
+                  <span className="hidden text-xs sm:inline sm:text-sm">{s.label}</span>
+                </span>
               </span>
-            </span>
-          ))}
-        </div>
+            ))}
+          </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-[1100px] px-6 py-5">
+      <main className="mx-auto max-w-[1100px] px-3 py-4 sm:px-6 sm:py-5">
         {screen === 'setup' && (
           <ScreenSetup onConfirm={handleSetupConfirm} />
         )}

@@ -40,7 +40,7 @@ export default function ScreenSetup({ onConfirm }: ScreenSetupProps) {
 
   return (
     <div
-      className="flex min-h-[70vh] items-center justify-center px-4"
+      className="flex min-h-[60vh] items-center justify-center px-2 sm:px-4"
       style={{ opacity: mounted ? 1 : 0, transition: 'opacity 0.4s ease' }}
     >
       <div className="w-full max-w-md">
@@ -81,14 +81,14 @@ export default function ScreenSetup({ onConfirm }: ScreenSetupProps) {
 
         {/* Card */}
         <div
-          className="rounded-2xl border p-8"
+          className="rounded-2xl border p-5 sm:p-8"
           style={{
             background: 'var(--card)',
             borderColor: 'var(--border2)',
           }}
         >
           <h2
-            className="font-condensed mb-1 text-center text-3xl font-black uppercase leading-tight"
+            className="font-condensed mb-1 text-center text-2xl font-black uppercase leading-tight sm:text-3xl"
             style={{ color: 'var(--text)' }}
           >
             Qual é o nome

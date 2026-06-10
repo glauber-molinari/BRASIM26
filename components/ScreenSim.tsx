@@ -61,33 +61,33 @@ export default function ScreenSim({
           </button>
         </div>
       )}
-      <div className="mb-4 flex flex-wrap items-center gap-3">
+      <div className="mb-4 flex flex-wrap items-center gap-2 sm:gap-3">
         <div>
           <h2 className="section-title">BRA26</h2>
           <p className="section-sub">38 rodadas · Meu Time {MY_TEAM_EMOJI}</p>
         </div>
-        <div className="ml-auto flex items-center gap-3">
-          <label className="text-sm text-[var(--text2)]">Velocidade</label>
+        <div className="ml-auto flex flex-wrap items-center gap-2 sm:gap-3">
+          <label className="hidden sm:inline text-sm text-[var(--text2)]">Velocidade</label>
           <select
             value={speed}
             disabled={running}
             onChange={(e) => onSpeedChange(Number(e.target.value) as SimSpeed)}
-            className="rounded-lg border border-[var(--border2)] bg-[var(--bg3)] px-3 py-2 text-sm text-[var(--text)]"
+            className="rounded-lg border border-[var(--border2)] bg-[var(--bg3)] px-2 py-2 text-sm text-[var(--text)] sm:px-3"
           >
             <option value={700}>Normal</option>
             <option value={250}>Rápido</option>
             <option value={60}>Ultra</option>
           </select>
-          <button type="button" onClick={onStart} disabled={running} className="btn-primary px-4 py-2 text-sm">
+          <button type="button" onClick={onStart} disabled={running} className="btn-primary px-3 py-2 text-sm sm:px-4">
             ▶ Iniciar
           </button>
-          <button type="button" onClick={onBack} disabled={running} className="btn-ghost">
+          <button type="button" onClick={onBack} disabled={running} className="btn-ghost px-3 py-2 text-sm">
             ← Voltar
           </button>
         </div>
       </div>
 
-      <div className="grid gap-3.5 md:grid-cols-[1fr_300px]">
+      <div className="grid gap-3.5 sm:grid-cols-1 md:grid-cols-[1fr_300px]">
         <div>
           <div className="mb-2 flex items-center justify-between">
             <button

@@ -56,9 +56,9 @@ export default function ScreenResult({
         className="overflow-hidden rounded-2xl border border-[var(--border2)]"
         style={{ background: 'linear-gradient(135deg, var(--green-dark) 0%, var(--bg2) 100%)' }}
       >
-        <div className="flex flex-col items-center gap-2 px-6 py-8 text-center">
+        <div className="flex flex-col items-center gap-2 px-4 py-6 text-center sm:px-6 sm:py-8">
           <div
-            className="font-condensed text-[88px] font-black leading-none"
+            className="font-condensed text-[64px] font-black leading-none sm:text-[88px]"
             style={{ color: zoneColor, textShadow: `0 0 40px ${zoneColor}44` }}
           >
             {myPos}º
@@ -78,11 +78,14 @@ export default function ScreenResult({
         </div>
 
         {/* Stats bar */}
-        <div className="grid grid-cols-6 divide-x divide-[var(--border)] border-t border-[var(--border)] bg-[var(--bg2)]/60">
-          {stats.map(({ v, l }) => (
-            <div key={l} className="py-3 text-center">
-              <div className="font-condensed text-2xl font-black text-white">{v}</div>
-              <div className="mt-0.5 text-[10px] uppercase tracking-wide text-[var(--text3)]">{l}</div>
+        <div className="grid grid-cols-3 divide-x divide-[var(--border)] border-t border-[var(--border)] bg-[var(--bg2)]/60 sm:grid-cols-6">
+          {stats.map(({ v, l }, idx) => (
+            <div
+              key={l}
+              className={`py-3 text-center ${idx >= 3 ? 'border-t border-[var(--border)] sm:border-t-0' : ''}`}
+            >
+              <div className="font-condensed text-xl font-black text-white sm:text-2xl">{v}</div>
+              <div className="mt-0.5 text-[9px] uppercase tracking-wide text-[var(--text3)] sm:text-[10px]">{l}</div>
             </div>
           ))}
         </div>
@@ -101,7 +104,7 @@ export default function ScreenResult({
                   {['#', 'Time', 'J', 'V', 'E', 'D', 'GP', 'GC', 'SG', 'PTS'].map((h, i) => (
                     <th
                       key={h}
-                      className={`px-3 py-2.5 font-condensed text-xs font-bold uppercase tracking-wide text-[var(--text3)] ${i === 1 ? 'text-left' : 'text-center'}`}
+                      className={`px-2 py-2 font-condensed text-xs font-bold uppercase tracking-wide text-[var(--text3)] sm:px-3 sm:py-2.5 ${i === 1 ? 'text-left' : 'text-center'} ${[6, 7, 8].includes(i) ? 'hidden sm:table-cell' : ''}`}
                     >
                       {h}
                     </th>
@@ -119,23 +122,25 @@ export default function ScreenResult({
                       key={s.id}
                       className={isMy ? 'bg-[rgba(20,163,82,0.08)]' : ''}
                     >
-                      <td className={`border-b border-[var(--border)] px-3 py-2 text-center text-sm font-bold ${zCls} ${isMy ? 'text-[var(--green-light)]' : 'text-[var(--text2)]'}`}>
+                      <td className={`border-b border-[var(--border)] px-2 py-1.5 text-center text-xs font-bold sm:px-3 sm:py-2 sm:text-sm ${zCls} ${isMy ? 'text-[var(--green-light)]' : 'text-[var(--text2)]'}`}>
                         {pos}
                       </td>
-                      <td className="border-b border-[var(--border)] px-3 py-2 text-left">
-                        <div className="flex items-center gap-2">
-                          <TeamLogo logo={t.logo} fallback={t.c} size={20} />
-                          <span className={`text-sm ${isMy ? 'font-bold text-[var(--green-light)]' : 'text-[var(--text2)]'}`}>
-                            {t.name}
+                      <td className="border-b border-[var(--border)] px-2 py-1.5 text-left sm:px-3 sm:py-2">
+                        <div className="flex items-center gap-1.5 sm:gap-2">
+                          <TeamLogo logo={t.logo} fallback={t.c} size={16} className="sm:hidden" />
+                          <TeamLogo logo={t.logo} fallback={t.c} size={20} className="hidden sm:inline-flex" />
+                          <span className={`text-xs sm:text-sm ${isMy ? 'font-bold text-[var(--green-light)]' : 'text-[var(--text2)]'}`}>
+                            <span className="sm:hidden">{t.short}</span>
+                            <span className="hidden sm:inline">{t.name}</span>
                           </span>
                         </div>
                       </td>
                       {[s.played, s.w, s.d, s.l, s.gf, s.ga, s.gf - s.ga].map((val, vi) => (
-                        <td key={vi} className="border-b border-[var(--border)] px-3 py-2 text-center text-sm text-[var(--text2)]">
+                        <td key={vi} className={`border-b border-[var(--border)] px-2 py-1.5 text-center text-xs sm:px-3 sm:py-2 sm:text-sm text-[var(--text2)] ${[4, 5, 6].includes(vi) ? 'hidden sm:table-cell' : ''}`}>
                           {val}
                         </td>
                       ))}
-                      <td className="border-b border-[var(--border)] px-3 py-2 text-center text-sm font-bold text-[var(--text)]">
+                      <td className="border-b border-[var(--border)] px-2 py-1.5 text-center text-xs font-bold sm:px-3 sm:py-2 sm:text-sm text-[var(--text)]">
                         {s.pts}
                       </td>
                     </tr>

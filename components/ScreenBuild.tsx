@@ -232,18 +232,20 @@ export default function ScreenBuild({
             🗑️
           </button>
           {isContinuing ? (
-            <button type="button" onClick={onContinueSim} disabled={count < 11} className="btn-primary">
-              Continuar (R.{currentRound}) →
+            <button type="button" onClick={onContinueSim} disabled={count < 11} className="btn-primary text-sm sm:text-base">
+              <span className="hidden sm:inline">Continuar (R.{currentRound}) →</span>
+              <span className="sm:hidden">R.{currentRound} →</span>
             </button>
           ) : (
-            <button type="button" onClick={onStart} disabled={count < 11} className="btn-primary">
-              Simular Campeonato →
+            <button type="button" onClick={onStart} disabled={count < 11} className="btn-primary text-sm sm:text-base">
+              <span className="hidden sm:inline">Simular Campeonato →</span>
+              <span className="sm:hidden">Simular →</span>
             </button>
           )}
         </div>
       </div>
 
-      <div className="grid items-start gap-4 md:grid-cols-[1fr_340px]">
+      <div className="grid items-start gap-4 md:grid-cols-[1fr_340px] md:flex-row">
         <div>
           <div className="mb-3 flex flex-wrap gap-1.5">
             {sortedTeams.map(({ t, i }) => (
@@ -259,7 +261,7 @@ export default function ScreenBuild({
             ))}
           </div>
 
-          <div className="panel max-h-[520px] overflow-y-auto">
+          <div className="panel max-h-[55vh] overflow-y-auto sm:max-h-[520px]">
             <div className="mb-3 flex items-center gap-3 border-b border-[var(--border)] pb-3">
               <TeamLogo logo={team.logo} fallback={team.c} size={40} />
               <span className="flex-1 font-condensed text-lg font-extrabold uppercase text-[var(--text)]">
@@ -313,7 +315,7 @@ export default function ScreenBuild({
           </div>
         </div>
 
-        <div className="sticky top-3 flex flex-col gap-3">
+        <div className="flex flex-col gap-3 md:sticky md:top-3">
           <TeamOverall lineup={lineup} />
 
           <div className="panel">

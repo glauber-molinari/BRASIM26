@@ -148,7 +148,7 @@ export default function LiveOverlay({
   const showStandings = phase === 'post' && standings.length > 0;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-black/80 p-3 backdrop-blur-sm sm:items-center sm:p-4">
       <div
         className={`flex w-full overflow-hidden rounded-2xl border-2 border-[var(--border2)] bg-[var(--bg2)] shadow-2xl ${
           showStandings ? 'max-w-[920px] flex-col lg:flex-row' : 'max-w-[520px] flex-col'
@@ -156,7 +156,7 @@ export default function LiveOverlay({
       >
         <div className={`min-w-0 ${showStandings ? 'flex-1' : 'w-full'}`}>
         <div
-          className="flex items-center justify-between px-5 py-3"
+          className="flex items-center justify-between px-4 py-3 sm:px-5"
           style={{ background: 'linear-gradient(135deg, var(--green-dark), var(--bg2))' }}
         >
           <span className="text-sm font-medium uppercase tracking-wide text-[var(--text2)]">
@@ -194,21 +194,23 @@ export default function LiveOverlay({
           </div>
         </div>
 
-        <div className="border-b border-[var(--border)] bg-[var(--card)] px-5 pb-4 pt-5">
-          <div className="flex items-center gap-2">
-            <div className="flex flex-1 flex-col items-center gap-2">
-              <TeamLogo logo={home.logo} fallback={home.c} size={56} />
+        <div className="border-b border-[var(--border)] bg-[var(--card)] px-4 pb-4 pt-4 sm:px-5 sm:pt-5">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="flex flex-1 flex-col items-center gap-1.5 sm:gap-2">
+              <TeamLogo logo={home.logo} fallback={home.c} size={40} className="sm:hidden" />
+              <TeamLogo logo={home.logo} fallback={home.c} size={56} className="hidden sm:block" />
               <div
-                className={`font-condensed text-base font-extrabold uppercase leading-tight text-center ${
+                className={`font-condensed text-xs font-extrabold uppercase leading-tight text-center sm:text-base ${
                   homeId === MY_TEAM_ID ? 'text-[var(--green-light)]' : 'text-[var(--text)]'
                 }`}
               >
-                {home.name}
+                <span className="sm:hidden">{home.short}</span>
+                <span className="hidden sm:inline">{home.name}</span>
               </div>
             </div>
 
-            <div className="flex flex-col items-center px-2">
-              <div className="font-condensed text-5xl font-black tracking-wider text-white">
+            <div className="flex flex-col items-center px-1 sm:px-2">
+              <div className="font-condensed text-4xl font-black tracking-wider text-white sm:text-5xl">
                 {phase === 'pre'
                   ? '– — –'
                   : phase === 'live'
@@ -220,14 +222,16 @@ export default function LiveOverlay({
               </div>
             </div>
 
-            <div className="flex flex-1 flex-col items-center gap-2">
-              <TeamLogo logo={away.logo} fallback={away.c} size={56} />
+            <div className="flex flex-1 flex-col items-center gap-1.5 sm:gap-2">
+              <TeamLogo logo={away.logo} fallback={away.c} size={40} className="sm:hidden" />
+              <TeamLogo logo={away.logo} fallback={away.c} size={56} className="hidden sm:block" />
               <div
-                className={`font-condensed text-base font-extrabold uppercase leading-tight text-center ${
+                className={`font-condensed text-xs font-extrabold uppercase leading-tight text-center sm:text-base ${
                   awayId === MY_TEAM_ID ? 'text-[var(--green-light)]' : 'text-[var(--text)]'
                 }`}
               >
-                {away.name}
+                <span className="sm:hidden">{away.short}</span>
+                <span className="hidden sm:inline">{away.name}</span>
               </div>
             </div>
           </div>
@@ -242,7 +246,7 @@ export default function LiveOverlay({
         </div>
 
         {phase === 'pre' && (
-          <div className="px-5 py-6 text-center">
+          <div className="px-4 py-5 text-center sm:px-5 sm:py-6">
             <div className="mb-5 text-base text-[var(--text2)]">
               Força do Meu Time — Ataque:{' '}
               <strong className="text-[var(--text)]">{Math.round(myStrength.att)}</strong> · Defesa:{' '}
@@ -258,7 +262,7 @@ export default function LiveOverlay({
           <>
             <div
               ref={evsRef}
-              className="flex h-[220px] flex-col gap-1 overflow-y-auto bg-[var(--bg)] px-5 py-3"
+              className="flex h-[170px] flex-col gap-1 overflow-y-auto bg-[var(--bg)] px-4 py-3 sm:h-[220px] sm:px-5"
             >
               {liveEvents.map((ev, i) => (
                 <LiveEventRow key={i} ev={ev} homeId={homeId} awayId={awayId} />
@@ -276,7 +280,7 @@ export default function LiveOverlay({
         )}
 
         {phase === 'post' && result && (
-          <div className="px-5 py-5">
+          <div className="px-4 py-4 sm:px-5 sm:py-5">
             <div
               className="mb-4 text-center font-condensed text-3xl font-black uppercase"
               style={{ color: outcome.color }}
@@ -365,7 +369,7 @@ export default function LiveOverlay({
         </div>
 
         {showStandings && (
-          <div className="max-h-[70vh] w-full border-t border-[var(--border)] lg:max-h-none lg:w-[340px] lg:border-l lg:border-t-0">
+          <div className="max-h-[50vh] w-full border-t border-[var(--border)] sm:max-h-[70vh] lg:max-h-none lg:w-[340px] lg:border-l lg:border-t-0">
             <OverlayStandings standings={standings} />
           </div>
         )}

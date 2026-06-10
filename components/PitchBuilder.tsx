@@ -19,7 +19,7 @@ export default function PitchBuilder({ lineup, onSlotClick }: PitchBuilderProps)
 
   return (
     <div
-      className="relative flex min-h-[310px] flex-col justify-between gap-0.5 rounded-lg p-1.5"
+      className="relative flex min-h-[260px] flex-col justify-between gap-0.5 rounded-lg p-1 sm:min-h-[310px] sm:p-1.5"
       style={{
         background: 'linear-gradient(180deg, #1a5e2a, #1e7032 50%, #1a5e2a)',
       }}
@@ -41,10 +41,10 @@ export default function PitchBuilder({ lineup, onSlotClick }: PitchBuilderProps)
                 key={idx}
                 type="button"
                 onClick={() => onSlotClick(idx)}
-                className="flex min-w-[58px] flex-col items-center p-1"
+                className="flex min-w-[44px] flex-col items-center p-0.5 sm:min-w-[58px] sm:p-1"
               >
                 <div
-                  className={`relative flex h-[42px] w-[42px] items-center justify-center overflow-hidden rounded-full transition-all ${
+                  className={`relative flex h-[34px] w-[34px] items-center justify-center overflow-hidden rounded-full transition-all sm:h-[42px] sm:w-[42px] ${
                     slot.player
                       ? 'border-2 border-white bg-white shadow-md'
                       : 'border-2 border-dashed border-white/40 bg-white/10'
@@ -70,7 +70,7 @@ export default function PitchBuilder({ lineup, onSlotClick }: PitchBuilderProps)
                     </span>
                   )}
                 </div>
-                <div className="mt-1 max-w-[58px] truncate text-center text-[9px] font-medium text-white">
+                <div className="mt-0.5 max-w-[44px] truncate text-center text-[8px] font-medium text-white sm:mt-1 sm:max-w-[58px] sm:text-[9px]">
                   {slot.player ? shn(slot.player.n) : '—'}
                 </div>
               </button>

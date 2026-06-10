@@ -51,7 +51,14 @@ body {
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
+  min-height: 100dvh;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Prevent double-tap zoom on touch devices */
+button, select, input, a {
+  touch-action: manipulation;
 }
 
 .font-condensed {
