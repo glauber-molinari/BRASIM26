@@ -278,8 +278,9 @@ export default function ScreenBuild({
         </div>
       </div>
 
-      <div className="grid items-start gap-4 md:grid-cols-[1fr_340px] md:flex-row">
-        <div>
+      <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(300px,1.25fr)_minmax(280px,320px)]">
+        {/* ── Esquerda: times e jogadores ── */}
+        <div className="min-w-0">
           <div className="mb-3 flex flex-wrap gap-1.5">
             {sortedTeams.map(({ t, i }) => (
               <button
@@ -358,7 +359,34 @@ export default function ScreenBuild({
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 md:sticky md:top-3">
+        {/* ── Centro: campinho grande ── */}
+        <div className="flex min-w-0 flex-col gap-3 lg:sticky lg:top-3">
+          <div className="panel">
+            <div className="panel-title">Clique em uma posição para escalar</div>
+            <PitchBuilder lineup={lineup} onSlotClick={setPickerIdx} size="large" />
+          </div>
+
+          <div className="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--bg3)] px-4 py-3">
+            <span className="text-sm text-[var(--text2)]">
+              Titulares: <strong className="text-lg text-[var(--green-light)]">{count}</strong>/11
+            </span>
+            <div className="flex gap-1.5">
+              {Array.from({ length: 11 }).map((_, i) => (
+                <div
+                  key={i}
+                  className={`h-3 w-3 rounded-full border-2 ${
+                    i < count
+                      ? 'border-[var(--green-light)] bg-[var(--green-light)]'
+                      : 'border-[var(--border2)] bg-transparent'
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ── Direita: configurações ── */}
+        <div className="flex min-w-0 flex-col gap-3 lg:sticky lg:top-3">
           <TeamOverall lineup={lineup} />
 
           <div className="panel">
@@ -397,29 +425,6 @@ export default function ScreenBuild({
                   </span>
                   <span className="text-[10px] text-[var(--text3)]">{s.desc}</span>
                 </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="panel">
-            <div className="panel-title">Clique em uma posição para escalar</div>
-            <PitchBuilder lineup={lineup} onSlotClick={setPickerIdx} />
-          </div>
-
-          <div className="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--bg3)] px-4 py-3">
-            <span className="text-sm text-[var(--text2)]">
-              Titulares: <strong className="text-lg text-[var(--green-light)]">{count}</strong>/11
-            </span>
-            <div className="flex gap-1.5">
-              {Array.from({ length: 11 }).map((_, i) => (
-                <div
-                  key={i}
-                  className={`h-3 w-3 rounded-full border-2 ${
-                    i < count
-                      ? 'border-[var(--green-light)] bg-[var(--green-light)]'
-                      : 'border-[var(--border2)] bg-transparent'
-                  }`}
-                />
               ))}
             </div>
           </div>

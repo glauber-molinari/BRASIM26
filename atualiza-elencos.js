@@ -24,7 +24,7 @@ const TEAMS = [
   { apiId: 118,  name: 'Bahia',               short: 'BAH', c: '🔵', att: 67, def: 64 },
   { apiId: 147,  name: 'Coritiba',            short: 'CFC', c: '🟢', att: 63, def: 62 },
   { apiId: 126,  name: 'São Paulo',           short: 'SPF', c: '⚪', att: 66, def: 65 },
-  { apiId: 117,  name: 'Atlético Mineiro',    short: 'CAM', c: '⚫', att: 67, def: 62 },
+  { apiId: 1062, name: 'Atlético Mineiro',    short: 'CAM', c: '⚫', att: 67, def: 62 },
   { apiId: 131,  name: 'Corinthians',         short: 'COR', c: '⚫', att: 65, def: 62 },
   { apiId: 135,  name: 'Cruzeiro',            short: 'CRU', c: '🔵', att: 64, def: 63 },
   { apiId: 120,  name: 'Botafogo',            short: 'BOT', c: '⚫', att: 69, def: 64 },
