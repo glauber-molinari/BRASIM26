@@ -428,7 +428,7 @@ export default function Home() {
   };
 
   return (
-    <>
+    <div className="flex min-h-screen flex-col">
       <header
         className="flex flex-col border-b border-[var(--border2)]"
         style={{ background: 'linear-gradient(135deg, var(--green-dark), var(--bg) 60%)' }}
@@ -486,7 +486,8 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-[1100px] px-3 py-4 sm:px-6 sm:py-5">
+      <main className="mx-auto flex w-full max-w-[1100px] flex-1 items-center px-3 py-4 sm:px-6 sm:py-5">
+        <div className="w-full">
         {screen === 'setup' && (
           <ScreenSetup onConfirm={handleSetupConfirm} />
         )}
@@ -509,6 +510,8 @@ export default function Home() {
             isContinuing={resumeRound > 0}
             currentRound={resumeRound}
             onContinueSim={handleContinueSim}
+            speed={speed}
+            onSpeedChange={setSpeed}
           />
         )}
 
@@ -542,6 +545,7 @@ export default function Home() {
             onRestart={handleRestart}
           />
         )}
+        </div>
       </main>
 
       <LiveOverlay
@@ -572,6 +576,6 @@ export default function Home() {
         standings={liveStandings}
         roundMatches={liveRoundMatches}
       />
-    </>
+    </div>
   );
 }
