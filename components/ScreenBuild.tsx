@@ -243,7 +243,7 @@ export default function ScreenBuild({
   };
 
   // Troca em modo de continuação: banco ↔ titular
-  const pickBenchContinuing = (tid: number, name: string, _pos: Position) => {
+  const pickBenchContinuing = (tid: number, name: string) => {
     if (benchPickerIdx === null) return;
     const fromLineupIdx = lineup.findIndex((s) => s.player?.n === name && s.player?.tid === tid);
     const fromBenchIdx = bench.findIndex((p) => p?.n === name && p?.tid === tid);
