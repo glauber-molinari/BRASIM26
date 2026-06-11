@@ -16,6 +16,7 @@ import type {
   Standing,
   StoredMatch,
 } from '@/lib/types';
+import MatchPitch from './MatchPitch';
 import OverlayStandings from './OverlayStandings';
 import TeamLogo from './TeamLogo';
 
@@ -114,6 +115,13 @@ export default function LiveOverlay({
   // Painel lateral visível no intervalo e na pausa
   const showSidePanel = phase === 'halftime' || (isLive && isPaused);
   const showStandings = phase === 'post' && standings.length > 0;
+
+  // Campinho animado — só na velocidade Normal (2200ms por tick)
+  const showPitch = isLive && speed === 2200;
+  const lastPitchEvent =
+    liveEvents.length > 0
+      ? { ev: liveEvents[liveEvents.length - 1], id: liveEvents.length }
+      : null;
 
   // ── Reset ao trocar de partida ──
   useEffect(() => {
@@ -355,6 +363,8 @@ export default function LiveOverlay({
         className={`flex w-full overflow-hidden rounded-2xl border-2 border-[var(--border2)] bg-[var(--bg2)] shadow-2xl ${
           showStandings
             ? 'max-w-[920px] flex-col lg:flex-row'
+            : showPitch
+            ? 'max-w-[900px] flex-col sm:flex-row'
             : showSidePanel
             ? 'max-w-[860px] flex-col sm:flex-row'
             : 'max-w-[520px] flex-col'
@@ -363,7 +373,13 @@ export default function LiveOverlay({
         {/* ══════════════ COLUNA PRINCIPAL ══════════════ */}
         <div
           className={`relative min-w-0 ${
-            showStandings ? 'flex-1' : showSidePanel ? 'sm:w-[370px] sm:flex-shrink-0' : 'w-full'
+            showStandings
+              ? 'flex-1'
+              : showPitch
+              ? 'sm:w-[520px] sm:flex-shrink-0'
+              : showSidePanel
+              ? 'sm:w-[370px] sm:flex-shrink-0'
+              : 'w-full'
           }`}
         >
           {/* ── HEADER ── */}
@@ -473,14 +489,27 @@ export default function LiveOverlay({
           {/* ── LIVE ── */}
           {isLive && (
             <>
-              <div
-                ref={evsRef}
-                className="flex h-[160px] flex-col gap-1 overflow-y-auto bg-[var(--bg)] px-4 py-3 sm:h-[200px] sm:px-5"
-              >
-                {liveEvents.map((ev, i) => (
-                  <LiveEventRow key={i} ev={ev} homeId={homeId} awayId={awayId} />
-                ))}
-              </div>
+              {showPitch && (
+                <MatchPitch
+                  homeName={home.name}
+                  awayName={away.name}
+                  hPoss={liveStats.hPoss}
+                  paused={isPaused}
+                  lastEvent={lastPitchEvent}
+                  onTogglePause={togglePause}
+                />
+              )}
+              {/* Feed embutido só sem o campinho — com ele, a timeline vira card lateral */}
+              {!showPitch && (
+                <div
+                  ref={evsRef}
+                  className="flex h-[160px] flex-col gap-1 overflow-y-auto bg-[var(--bg)] px-4 py-3 sm:h-[200px] sm:px-5"
+                >
+                  {liveEvents.map((ev, i) => (
+                    <LiveEventRow key={i} ev={ev} homeId={homeId} awayId={awayId} />
+                  ))}
+                </div>
+              )}
 
               {/* Stats em tempo real */}
               <div className="grid grid-cols-4 gap-1.5 border-t border-[var(--border)] px-4 py-2">
@@ -662,6 +691,34 @@ export default function LiveOverlay({
             </div>
           )}
         </div>
+
+        {/* ══════════════ TIMELINE LATERAL (campinho ativo) ══════════════ */}
+        {showPitch && !showSidePanel && (
+          <div className="flex flex-1 flex-col border-t border-[var(--border)] sm:border-l sm:border-t-0">
+            <div
+              className="flex items-center gap-2 border-b border-[var(--border)] px-4 py-2.5"
+              style={{ background: 'linear-gradient(135deg, var(--green-dark), var(--bg2))' }}
+            >
+              <span className="text-xs font-bold uppercase tracking-wide text-[var(--text2)]">
+                📅 Timeline da partida
+              </span>
+            </div>
+            <div
+              ref={evsRef}
+              className="flex max-h-[240px] min-h-0 flex-1 flex-col gap-1 overflow-y-auto bg-[var(--bg)] p-3 sm:max-h-none"
+            >
+              {liveEvents.length === 0 ? (
+                <div className="py-4 text-center text-xs text-[var(--text3)]">
+                  Nenhum evento ainda
+                </div>
+              ) : (
+                liveEvents.map((ev, i) => (
+                  <LiveEventRow key={i} ev={ev} homeId={homeId} awayId={awayId} />
+                ))
+              )}
+            </div>
+          </div>
+        )}
 
         {/* ══════════════ PAINEL LATERAL (intervalo / pausa) ══════════════ */}
         {showSidePanel && (
