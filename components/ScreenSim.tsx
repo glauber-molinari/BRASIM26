@@ -1,6 +1,6 @@
 'use client';
 
-import { MY_TEAM_ID, MY_TEAM_EMOJI, PLAYER_PHOTO_MAP } from '@/data/teams';
+import { MY_TEAM_ID, PLAYER_PHOTO_MAP } from '@/data/teams';
 import { getTeamDisplay } from '@/lib/simulator';
 import { shn } from '@/lib/helpers';
 import { getPlayerPhoto } from '@/data/playerPhotos';
