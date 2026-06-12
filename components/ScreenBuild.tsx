@@ -69,9 +69,11 @@ export default function ScreenBuild({
 }: ScreenBuildProps) {
   const [activeTab, setActiveTab] = useState(activeTeamTab === 0 ? FIRST_ALPHA_IDX : activeTeamTab);
   const [benchPickerIdx, setBenchPickerIdx] = useState<number | null>(null);
+  const [playerSearch, setPlayerSearch] = useState('');
 
   useEffect(() => {
     setActiveTab(activeTeamTab === 0 ? FIRST_ALPHA_IDX : activeTeamTab);
+    setPlayerSearch('');
   }, [activeTeamTab]);
   const [pickerIdx, setPickerIdx] = useState<number | null>(null);
 
@@ -338,7 +340,7 @@ export default function ScreenBuild({
                 <button
                   key={t.id}
                   type="button"
-                  onClick={() => setActiveTab(i)}
+                  onClick={() => { setActiveTab(i); setPlayerSearch(''); }}
                   title={t.name}
                   className={`rounded-lg border py-1.5 text-center text-xs font-bold tracking-wide transition-colors ${
                     i === activeTab
@@ -380,8 +382,22 @@ export default function ScreenBuild({
               </div>
             </div>
 
+            {/* Busca de jogadores */}
+            <div className="mb-3">
+              <input
+                type="text"
+                value={playerSearch}
+                onChange={(e) => setPlayerSearch(e.target.value)}
+                placeholder="Buscar jogador…"
+                className="w-full rounded-lg border border-[var(--border2)] bg-[var(--bg3)] px-3 py-1.5 text-sm text-[var(--text)] placeholder-[var(--text3)] outline-none focus:border-[var(--green-light)]"
+              />
+            </div>
+
             {(['GK', 'DF', 'MF', 'FW'] as Position[]).map((pos) => {
-              if (!byPos[pos].length) return null;
+              const filtered = byPos[pos].filter((p) =>
+                p.n.toLowerCase().includes(playerSearch.toLowerCase())
+              );
+              if (!filtered.length) return null;
               return (
                 <div key={pos} className="mb-3 last:mb-0">
                   <div className="mb-1 flex items-center gap-1.5">
@@ -390,7 +406,7 @@ export default function ScreenBuild({
                       {POS_LABELS[pos]}
                     </span>
                   </div>
-                  {byPos[pos].map((p) => {
+                  {filtered.map((p) => {
                     const inLU = lineup.some(
                       (s) => s.player?.n === p.n && s.player?.tid === team.id
                     );
