@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { AD_BOARDS } from '@/data/adBoards';
 import type { MatchEvent } from '@/lib/types';
 
 // Campo em unidades SVG (105 x 68 — proporções FIFA)
@@ -8,8 +9,9 @@ const W = 105;
 const H = 68;
 const CENTER = { x: W / 2, y: H / 2 };
 
-const WANDER_SPEED = 26; // unidades/s — jogo corrido
 const DASH_SPEED = 90; // unidades/s — arrancada para o gol
+const RETURN_SPEED = 38; // unidades/s — bola voltando ao centro após gol
+const CLEAR_SPEED = 55; // unidades/s — reposição do goleiro
 const MAX_TRAIL = 5;
 
 export interface PitchEvent {
@@ -25,6 +27,18 @@ interface RibbonStatus {
   goal?: boolean;
 }
 
+// O motor processa uma fila de ações: deslocamentos, pausas, letreiros e
+// efeitos. Eventos reais da partida substituem a fila por uma sequência
+// coreografada (gol → comemoração → saída de bola no centro, etc.).
+// Ações "essential" pertencem à coreografia de um evento real e nunca são
+// descartadas; as demais são jogo corrido e podem ser interrompidas.
+type Action = (
+  | { kind: 'move'; x: number; y: number; v: number; clearTrail?: boolean }
+  | { kind: 'hold'; ms: number }
+  | { kind: 'ribbon'; status: RibbonStatus }
+  | { kind: 'do'; fn: () => void }
+) & { essential?: boolean };
+
 interface MatchPitchProps {
   homeName: string;
   awayName: string;
@@ -36,6 +50,28 @@ interface MatchPitchProps {
 
 const rand = (min: number, max: number) => min + Math.random() * (max - min);
 const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
+
+// Espaços para as placas de publicidade no perímetro do campo: faixa no lado
+// de fundo (topo) e atrás dos dois gols. Os anúncios vêm de data/adBoards.ts.
+interface AdSlot {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  rot?: number;
+}
+
+const AD_SLOTS: AdSlot[] = (() => {
+  const slots: AdSlot[] = [];
+  const TOP_N = 6;
+  const tw = 123 / TOP_N;
+  for (let i = 0; i < TOP_N; i++) slots.push({ x: -9 + i * tw, y: -7, w: tw, h: 4 });
+  const SIDE_N = 4;
+  const sh = H / SIDE_N;
+  for (let i = 0; i < SIDE_N; i++) slots.push({ x: -9, y: i * sh, w: 3.5, h: sh, rot: -90 });
+  for (let i = 0; i < SIDE_N; i++) slots.push({ x: 110.5, y: i * sh, w: 3.5, h: sh, rot: 90 });
+  return slots;
+})();
 
 export default function MatchPitch({
   homeName,
@@ -50,21 +86,23 @@ export default function MatchPitch({
 
   // Estado do "motor" da bola — refs para não re-renderizar a cada frame
   const pos = useRef({ ...CENTER });
-  const target = useRef({ ...CENTER });
   const trail = useRef<{ x: number; y: number }[]>([]);
   const poss = useRef<Side>('home');
-  const mode = useRef<'wander' | 'dash' | 'hold'>('hold');
-  const holdUntil = useRef(0);
-  const afterHold = useRef<(() => void) | null>(null);
-  const pendingEv = useRef<MatchEvent | null>(null);
+  const queue = useRef<Action[]>([
+    { kind: 'ribbon', status: { team: 'home', text: 'Saída de bola' } },
+    { kind: 'hold', ms: 700 },
+  ]);
+  const activeMove = useRef<{ x: number; y: number; v: number } | null>(null);
+  const holdUntil = useRef<number | null>(null);
+  const activeIsEssential = useRef(false);
 
   const pausedRef = useRef(paused);
   pausedRef.current = paused;
   const hPossRef = useRef(hPoss);
   hPossRef.current = hPoss;
 
-  const [status, setStatus] = useState<RibbonStatus>({ team: 'home', text: 'Bola segura' });
-  const statusKey = useRef('home|Bola segura|0');
+  const [status, setStatus] = useState<RibbonStatus>({ team: 'home', text: 'Saída de bola' });
+  const statusKey = useRef('home|Saída de bola|0');
 
   const setRibbon = useCallback((s: RibbonStatus) => {
     const key = `${s.team}|${s.text}|${s.goal ? 1 : 0}`;
@@ -83,50 +121,23 @@ export default function MatchPitch({
     let raf = 0;
     let last = performance.now();
 
-    // A movimentação entre eventos é sintética: random walk puxado para o
-    // lado do time com mais posse, como nos campinhos de SofaScore/FotMob.
-    const pickTarget = () => {
+    // Jogo corrido entre eventos: random walk puxado para o lado do time
+    // com mais posse, como nos campinhos de SofaScore/FotMob.
+    const enqueueWanderLeg = () => {
       const keep = poss.current === 'home' ? hPossRef.current : 100 - hPossRef.current;
       if (rand(0, 100) > keep) poss.current = poss.current === 'home' ? 'away' : 'home';
       const dir = poss.current === 'home' ? 1 : -1;
-      pushTrail();
-      target.current = {
-        x: clamp(pos.current.x + dir * rand(6, 24), 7, 98),
-        y: clamp(pos.current.y + rand(-15, 15), 8, 60),
-      };
-      mode.current = 'wander';
-      const dangerous = poss.current === 'home' ? target.current.x > 76 : target.current.x < 29;
-      setRibbon({ team: poss.current, text: dangerous ? 'Ataque perigoso' : 'Bola segura' });
-    };
-
-    const resolveEvent = (now: number) => {
-      const ev = pendingEv.current;
-      pendingEv.current = null;
-      mode.current = 'hold';
-      if (!ev) {
-        holdUntil.current = now + 300;
-        return;
-      }
-      if (ev.type === 'goal') {
-        setRibbon({ team: ev.team, text: '⚽ GOOOL!', goal: true });
-        holdUntil.current = now + 1800;
-        afterHold.current = () => {
-          trail.current = [];
-          pos.current = { ...CENTER };
-          poss.current = ev.team === 'home' ? 'away' : 'home'; // saída de quem sofreu o gol
-          pickTarget();
-        };
-      } else if (ev.type === 'save') {
-        setRibbon({ team: ev.team, text: '🧤 Defesa do goleiro' });
-        holdUntil.current = now + 1200;
-        afterHold.current = () => {
-          poss.current = ev.team;
-          pickTarget();
-        };
-      } else {
-        setRibbon({ team: ev.team, text: 'Na trave!' });
-        holdUntil.current = now + 1200;
-      }
+      const tx = clamp(pos.current.x + dir * rand(6, 24), 7, 98);
+      const ty = clamp(pos.current.y + rand(-15, 15), 8, 60);
+      const dangerous = poss.current === 'home' ? tx > 76 : tx < 29;
+      queue.current.push(
+        {
+          kind: 'ribbon',
+          status: { team: poss.current, text: dangerous ? 'Ataque perigoso' : 'Bola segura' },
+        },
+        { kind: 'move', x: tx, y: ty, v: rand(20, 34) },
+        { kind: 'hold', ms: rand(120, 450) },
+      );
     };
 
     const draw = () => {
@@ -139,26 +150,37 @@ export default function MatchPitch({
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
       if (!pausedRef.current) {
-        if (mode.current === 'hold') {
-          if (now >= holdUntil.current) {
-            const fn = afterHold.current;
-            afterHold.current = null;
-            if (fn) fn();
-            else pickTarget();
+        // Consome ações instantâneas até iniciar um deslocamento ou pausa
+        while (!activeMove.current && holdUntil.current === null) {
+          const next = queue.current.shift();
+          if (!next) {
+            enqueueWanderLeg();
+            continue;
           }
-        } else {
-          const v = mode.current === 'dash' ? DASH_SPEED : WANDER_SPEED;
-          const dx = target.current.x - pos.current.x;
-          const dy = target.current.y - pos.current.y;
+          if (next.kind === 'ribbon') setRibbon(next.status);
+          else if (next.kind === 'do') next.fn();
+          else if (next.kind === 'hold') {
+            holdUntil.current = now + next.ms;
+            activeIsEssential.current = !!next.essential;
+          } else {
+            if (next.clearTrail) trail.current = [];
+            pushTrail();
+            activeMove.current = { x: next.x, y: next.y, v: next.v };
+            activeIsEssential.current = !!next.essential;
+          }
+        }
+
+        if (holdUntil.current !== null) {
+          if (now >= holdUntil.current) holdUntil.current = null;
+        } else if (activeMove.current) {
+          const t = activeMove.current;
+          const dx = t.x - pos.current.x;
+          const dy = t.y - pos.current.y;
           const dist = Math.hypot(dx, dy);
-          const stepLen = v * dt;
+          const stepLen = t.v * dt;
           if (dist <= stepLen) {
-            pos.current = { ...target.current };
-            if (mode.current === 'dash') resolveEvent(now);
-            else {
-              mode.current = 'hold';
-              holdUntil.current = now + rand(120, 450);
-            }
+            pos.current = { x: t.x, y: t.y };
+            activeMove.current = null;
           } else {
             pos.current.x += (dx / dist) * stepLen;
             pos.current.y += (dy / dist) * stepLen;
@@ -181,31 +203,83 @@ export default function MatchPitch({
     if (!lastEvent || lastEvent.id === seenId.current) return;
     seenId.current = lastEvent.id;
     const { ev } = lastEvent;
-    const now = performance.now();
 
-    if (ev.type === 'goal' || ev.type === 'save' || ev.type === 'post') {
-      // Em defesas, quem ataca é o adversário do goleiro que defendeu
-      const attacker: Side = ev.type === 'save' ? (ev.team === 'home' ? 'away' : 'home') : ev.team;
-      poss.current = attacker;
-      pushTrail();
-      target.current = { x: attacker === 'home' ? 100.5 : 4.5, y: CENTER.y + rand(-4, 4) };
-      pendingEv.current = ev;
-      afterHold.current = null;
-      mode.current = 'dash';
+    // Mantém coreografias pendentes de eventos anteriores e descarta apenas o
+    // jogo corrido — assim, dois gols seguidos tocam um após o outro e nenhum
+    // perde a volta da bola ao centro.
+    const enqueue = (seq: Action[]) => {
+      queue.current = queue.current.filter((a) => a.essential);
+      if (!activeIsEssential.current) {
+        activeMove.current = null;
+        holdUntil.current = null;
+      }
+      queue.current.push(...seq.map((a) => ({ ...a, essential: true })));
+    };
+
+    if (ev.type === 'goal') {
+      const attacker = ev.team;
+      const conceding: Side = attacker === 'home' ? 'away' : 'home';
+      enqueue([
+        { kind: 'do', fn: () => { poss.current = attacker; } },
+        { kind: 'move', x: attacker === 'home' ? 102 : 3, y: CENTER.y + rand(-3, 3), v: DASH_SPEED },
+        { kind: 'ribbon', status: { team: attacker, text: '⚽ GOOOL!', goal: true } },
+        { kind: 'hold', ms: 1400 },
+        // Como na vida real: a bola volta ao centro para o reinício
+        { kind: 'ribbon', status: { team: conceding, text: 'Saída de bola' } },
+        { kind: 'move', x: CENTER.x, y: CENTER.y, v: RETURN_SPEED, clearTrail: true },
+        { kind: 'hold', ms: 550 },
+        { kind: 'do', fn: () => { poss.current = conceding; } },
+      ]);
+    } else if (ev.type === 'save') {
+      const saving = ev.team;
+      const attacker: Side = saving === 'home' ? 'away' : 'home';
+      const gx = saving === 'home' ? 4 : 101;
+      const dir = saving === 'home' ? 1 : -1;
+      enqueue([
+        { kind: 'do', fn: () => { poss.current = attacker; } },
+        { kind: 'move', x: gx, y: CENTER.y + rand(-4, 4), v: DASH_SPEED },
+        { kind: 'ribbon', status: { team: saving, text: '🧤 Defesa do goleiro' } },
+        { kind: 'hold', ms: 900 },
+        // Goleiro segura e repõe com um chutão
+        { kind: 'do', fn: () => { poss.current = saving; } },
+        { kind: 'ribbon', status: { team: saving, text: 'Bola segura' } },
+        {
+          kind: 'move',
+          x: clamp(gx + dir * rand(28, 45), 10, 95),
+          y: rand(14, 54),
+          v: CLEAR_SPEED,
+          clearTrail: true,
+        },
+        { kind: 'hold', ms: 250 },
+      ]);
+    } else if (ev.type === 'post') {
+      const attacker = ev.team;
+      const gx = attacker === 'home' ? 102 : 3;
+      const dirBack = attacker === 'home' ? -1 : 1;
+      enqueue([
+        { kind: 'do', fn: () => { poss.current = attacker; } },
+        { kind: 'move', x: gx, y: CENTER.y + rand(-3, 3), v: DASH_SPEED },
+        { kind: 'ribbon', status: { team: attacker, text: 'Na trave!' } },
+        // Rebote para fora da área
+        { kind: 'move', x: gx + dirBack * rand(8, 14), y: clamp(CENTER.y + rand(-8, 8), 8, 60), v: 50 },
+        { kind: 'hold', ms: 600 },
+        { kind: 'do', fn: () => { poss.current = Math.random() < 0.5 ? 'home' : 'away'; } },
+      ]);
     } else if (ev.type === 'yellow' || ev.type === 'red') {
-      setRibbon({ team: ev.team, text: ev.type === 'yellow' ? '🟨 Cartão amarelo' : '🟥 Expulsão!' });
-      pendingEv.current = null;
-      afterHold.current = null;
-      mode.current = 'hold';
-      holdUntil.current = now + 1300;
+      enqueue([
+        {
+          kind: 'ribbon',
+          status: { team: ev.team, text: ev.type === 'yellow' ? '🟨 Cartão amarelo' : '🟥 Expulsão!' },
+        },
+        { kind: 'hold', ms: 1300 },
+      ]);
     } else if (ev.type === 'sub') {
-      setRibbon({ team: ev.team, text: '🔄 Substituição' });
-      pendingEv.current = null;
-      afterHold.current = null;
-      mode.current = 'hold';
-      holdUntil.current = now + 1300;
+      enqueue([
+        { kind: 'ribbon', status: { team: ev.team, text: '🔄 Substituição' } },
+        { kind: 'hold', ms: 1300 },
+      ]);
     }
-  }, [lastEvent, pushTrail, setRibbon]);
+  }, [lastEvent]);
 
   const ribbonName = status.team === 'home' ? homeName : status.team === 'away' ? awayName : '';
 
@@ -279,6 +353,45 @@ export default function MatchPitch({
                 <polygon points="0,-3 2.2,-2.4 0,-1.8" fill="#e53935" />
               </g>
             ))}
+
+            {/* Placas de publicidade (edite os textos em data/adBoards.ts) */}
+            {AD_SLOTS.map((s, i) => {
+              const ad = AD_BOARDS[i % AD_BOARDS.length];
+              const cx = s.x + s.w / 2;
+              const cy = s.y + s.h / 2;
+              const len = s.rot ? s.h : s.w;
+              const fs = Math.max(
+                1.1,
+                Math.min(2.7, (len - 3.5) / (Math.max(ad.text.length, 1) * 0.58)),
+              );
+              return (
+                <g key={`ad-${i}`}>
+                  <rect
+                    x={s.x + 0.4}
+                    y={s.y + 0.4}
+                    width={s.w - 0.8}
+                    height={s.h - 0.8}
+                    rx={0.5}
+                    fill={ad.bg ?? '#0a1812'}
+                    stroke="rgba(255,255,255,0.18)"
+                    strokeWidth={0.15}
+                  />
+                  <text
+                    x={cx}
+                    y={cy}
+                    transform={s.rot ? `rotate(${s.rot} ${cx} ${cy})` : undefined}
+                    fontSize={fs}
+                    fontWeight={700}
+                    fill={ad.color ?? '#e9f4ec'}
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    letterSpacing={0.15}
+                  >
+                    {ad.text}
+                  </text>
+                </g>
+              );
+            })}
 
             {/* Rastro da bola */}
             <polyline
