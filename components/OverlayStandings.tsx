@@ -3,14 +3,16 @@
 import { MY_TEAM_ID } from '@/data/teams';
 import { getTeamDisplay, sortedStandings } from '@/lib/simulator';
 import { getZone, getZoneBorder } from '@/lib/helpers';
-import type { Standing } from '@/lib/types';
+import type { ShieldConfig, Standing } from '@/lib/types';
 import TeamLogo from './TeamLogo';
+import ShieldSvg from './ShieldSvg';
 
 interface OverlayStandingsProps {
   standings: Standing[];
+  shieldConfig?: ShieldConfig;
 }
 
-export default function OverlayStandings({ standings }: OverlayStandingsProps) {
+export default function OverlayStandings({ standings, shieldConfig }: OverlayStandingsProps) {
   const sorted = sortedStandings(standings);
   const myPos = sorted.findIndex((s) => s.id === MY_TEAM_ID) + 1;
   const myStanding = sorted.find((s) => s.id === MY_TEAM_ID);
@@ -96,7 +98,9 @@ export default function OverlayStandings({ standings }: OverlayStandingsProps) {
                   </td>
                   <td className="border-b border-[var(--border)] px-2 py-1.5">
                     <div className="flex items-center gap-1">
-                      <TeamLogo logo={t.logo} fallback={t.c} size={16} />
+                      {isMy && shieldConfig
+                        ? <ShieldSvg config={shieldConfig} short={t.short} size={14} />
+                        : <TeamLogo logo={t.logo} fallback={t.c} size={16} />}
                       <span className={isMy ? 'text-[var(--green-light)]' : ''}>{t.short}</span>
                     </div>
                   </td>

@@ -100,6 +100,25 @@ export type Screen = 'setup' | 'build' | 'sim' | 'result';
 
 export type LivePhase = 'pre' | 'live1' | 'halftime' | 'live2' | 'post';
 
+export type ShieldShape = 'classic' | 'modern' | 'angular' | 'round' | 'crest';
+export type ShieldAdornment = 'none' | 'vstripe' | 'hstripes' | 'diag' | 'cross' | 'halves' | 'chevron';
+
+export interface ShieldConfig {
+  shape: ShieldShape;
+  primary: string;
+  secondary: string;
+  tertiary: string;
+  adornment: ShieldAdornment;
+}
+
+export const DEFAULT_SHIELD: ShieldConfig = {
+  shape: 'classic',
+  primary: '#1A56DB',
+  secondary: '#F5F5F5',
+  tertiary: '#F5F5F5',
+  adornment: 'none',
+};
+
 export interface TeamData {
   id: number;
   name: string;

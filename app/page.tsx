@@ -24,11 +24,13 @@ import type {
   MatchSegment,
   Screen,
   SelectedPlayer,
+  ShieldConfig,
   SimSpeed,
   Standing,
   StoredMatch,
   TacticKey,
 } from '@/lib/types';
+import { DEFAULT_SHIELD } from '@/lib/types';
 import ScreenSetup from '@/components/ScreenSetup';
 import ScreenBuild from '@/components/ScreenBuild';
 import ScreenSim from '@/components/ScreenSim';
@@ -44,6 +46,7 @@ const STEPS: { id: Screen; label: string }[] = [
 
 export default function Home() {
   const [screen, setScreen] = useState<Screen>('setup');
+  const [shieldConfig, setShieldConfig] = useState<ShieldConfig>(DEFAULT_SHIELD);
   const [tactic, setTactic] = useState<TacticKey>('4-3-3');
   const [lineup, setLineup] = useState<LineupSlot[]>(() => buildLineupFromTactic('4-3-3'));
   const [teamUsage, setTeamUsage] = useState<Record<number, number>>({});
@@ -85,8 +88,9 @@ export default function Home() {
 
   const stepIndex = screen === 'setup' ? 1 : screen === 'build' ? 2 : screen === 'sim' ? 3 : 4;
 
-  const handleSetupConfirm = (name: string, short: string) => {
+  const handleSetupConfirm = (name: string, short: string, shield: ShieldConfig) => {
     setMyTeam(name, short);
+    setShieldConfig(shield);
     setScreen('build');
   };
 
@@ -526,6 +530,7 @@ export default function Home() {
             speed={speed}
             running={running}
             pendingLive={pendingLive}
+            shieldConfig={shieldConfig}
             onSpeedChange={setSpeed}
             onStart={runSim}
             onBack={() => setScreen('build')}
@@ -542,6 +547,7 @@ export default function Home() {
             lineup={lineup}
             playerGoals={playerGoals}
             matchHistory={matchHistory}
+            shieldConfig={shieldConfig}
             onRestart={handleRestart}
           />
         )}
@@ -575,6 +581,7 @@ export default function Home() {
         onChangeStyle={handleLiveChangeStyle}
         standings={liveStandings}
         roundMatches={liveRoundMatches}
+        shieldConfig={shieldConfig}
       />
     </div>
   );

@@ -3,19 +3,22 @@
 import { MY_TEAM_ID } from '@/data/teams';
 import { getTeamDisplay, sortedStandings } from '@/lib/simulator';
 import { getZoneBorder } from '@/lib/helpers';
-import type { Standing } from '@/lib/types';
+import type { ShieldConfig, Standing } from '@/lib/types';
 import TeamLogo from './TeamLogo';
+import ShieldSvg from './ShieldSvg';
 
 interface StandingsTableProps {
   standings: Standing[];
   compact?: boolean;
   aroundMyTeam?: boolean;
+  shieldConfig?: ShieldConfig;
 }
 
 export default function StandingsTable({
   standings,
   compact = false,
   aroundMyTeam = false,
+  shieldConfig,
 }: StandingsTableProps) {
   const sorted = sortedStandings(standings);
 
@@ -38,7 +41,9 @@ export default function StandingsTable({
                 <td className="px-1 py-0.5 text-[var(--text3)]">{s.pos}</td>
                 <td className="px-1 py-0.5">
                   <div className="flex items-center gap-1">
-                    <TeamLogo logo={t.logo} fallback={t.c} size={16} />
+                    {isMy && shieldConfig
+                      ? <ShieldSvg config={shieldConfig} short={t.short} size={14} />
+                      : <TeamLogo logo={t.logo} fallback={t.c} size={16} />}
                     {t.name}
                   </div>
                 </td>
@@ -83,7 +88,9 @@ export default function StandingsTable({
                 </td>
                 <td className="border-b border-[var(--border)] px-1.5 py-1 text-left text-[var(--text2)]">
                   <div className="flex items-center gap-1.5">
-                    <TeamLogo logo={t.logo} fallback={t.c} size={20} />
+                    {isMy && shieldConfig
+                      ? <ShieldSvg config={shieldConfig} short={t.short} size={18} />
+                      : <TeamLogo logo={t.logo} fallback={t.c} size={20} />}
                     {t.name}
                   </div>
                 </td>

@@ -3,14 +3,16 @@
 import { MY_TEAM_ID } from '@/data/teams';
 import { getTeamDisplay, sortedStandings } from '@/lib/simulator';
 import { getZone, getZoneBorder } from '@/lib/helpers';
-import type { LineupSlot, MatchHistoryEntry, Standing } from '@/lib/types';
+import type { LineupSlot, MatchHistoryEntry, ShieldConfig, Standing } from '@/lib/types';
 import TeamLogo from './TeamLogo';
+import ShieldSvg from './ShieldSvg';
 
 interface ScreenResultProps {
   standings: Standing[];
   lineup: LineupSlot[];
   playerGoals: Record<string, number>;
   matchHistory: MatchHistoryEntry[];
+  shieldConfig: ShieldConfig;
   onRestart: () => void;
 }
 
@@ -22,6 +24,7 @@ export default function ScreenResult({
   lineup,
   playerGoals,
   matchHistory,
+  shieldConfig,
   onRestart,
 }: ScreenResultProps) {
   const sorted = sortedStandings(standings);
@@ -64,7 +67,7 @@ export default function ScreenResult({
             {myPos}º
           </div>
           <div className="flex items-center gap-2">
-            <TeamLogo logo={myTeam.logo} fallback={myTeam.c} size={28} />
+            <ShieldSvg config={shieldConfig} short={myTeam.short} size={24} />
             <span className="font-condensed text-xl font-extrabold uppercase tracking-wide text-white">
               {myTeam.name}
             </span>
@@ -127,8 +130,12 @@ export default function ScreenResult({
                       </td>
                       <td className="border-b border-[var(--border)] px-2 py-1.5 text-left sm:px-3 sm:py-2">
                         <div className="flex items-center gap-1.5 sm:gap-2">
-                          <TeamLogo logo={t.logo} fallback={t.c} size={16} className="sm:hidden" />
-                          <TeamLogo logo={t.logo} fallback={t.c} size={20} className="hidden sm:inline-flex" />
+                          {isMy
+                            ? <ShieldSvg config={shieldConfig} short={t.short} size={14} />
+                            : <>
+                                <TeamLogo logo={t.logo} fallback={t.c} size={16} className="sm:hidden" />
+                                <TeamLogo logo={t.logo} fallback={t.c} size={20} className="hidden sm:inline-flex" />
+                              </>}
                           <span className={`text-xs sm:text-sm ${isMy ? 'font-bold text-[var(--green-light)]' : 'text-[var(--text2)]'}`}>
                             <span className="sm:hidden">{t.short}</span>
                             <span className="hidden sm:inline">{t.name}</span>

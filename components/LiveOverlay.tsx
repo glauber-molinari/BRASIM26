@@ -13,12 +13,14 @@ import type {
   MatchResult,
   MatchSegment,
   SelectedPlayer,
+  ShieldConfig,
   Standing,
   StoredMatch,
 } from '@/lib/types';
 import MatchPitch from './MatchPitch';
 import OverlayStandings from './OverlayStandings';
 import TeamLogo from './TeamLogo';
+import ShieldSvg from './ShieldSvg';
 
 const LIVE_MINUTES_1 = [10, 20, 30, 40, 45];
 const LIVE_MINUTES_2 = [55, 65, 75, 85, 90, 91, 92, 93, 94];
@@ -58,6 +60,7 @@ interface LiveOverlayProps {
   onChangeStyle: (style: GameStyle) => void;
   standings: Standing[];
   roundMatches: StoredMatch[];
+  shieldConfig: ShieldConfig;
 }
 
 export default function LiveOverlay({
@@ -87,6 +90,7 @@ export default function LiveOverlay({
   onChangeStyle,
   standings,
   roundMatches,
+  shieldConfig,
 }: LiveOverlayProps) {
   // ── Animação ──
   const [liveMin, setLiveMin] = useState(0);
@@ -167,6 +171,15 @@ export default function LiveOverlay({
     }
   }, []);
 
+  // Pausa após cada evento do feed. Na velocidade Normal (com campinho),
+  // respeita a duração da coreografia da bola para a animação acompanhar.
+  const pauseFor = useCallback((ev: MatchEvent) => {
+    if (speed !== 2200) return speed * 0.35;
+    if (ev.type === 'goal') return speed * 2.0;
+    if (ev.type === 'save' || ev.type === 'post') return speed * 0.9;
+    return speed * 0.6;
+  }, [speed]);
+
   const pauseMatch = useCallback(() => { pausedRef.current = true; setIsPaused(true); }, []);
   const resumeMatch = useCallback(() => {
     pausedRef.current = false;
@@ -200,7 +213,7 @@ export default function LiveOverlay({
           const ev = queue.shift()!;
           if (ev.type === 'goal') { if (ev.team === 'home') hs++; else as++; setLiveScore({ h: hs, a: as }); }
           setLiveEvents((prev) => [...prev, ev]);
-          await sleepOrPause(speed * 0.35);
+          await sleepOrPause(pauseFor(ev));
         }
         await sleepOrPause(speed * 0.6);
       }
@@ -208,7 +221,7 @@ export default function LiveOverlay({
         const ev = queue.shift()!;
         if (ev.type === 'goal') { if (ev.team === 'home') hs++; else as++; setLiveScore({ h: hs, a: as }); }
         setLiveEvents((prev) => [...prev, ev]);
-        await sleepOrPause(speed * 0.2);
+        await sleepOrPause(speed === 2200 ? pauseFor(ev) : speed * 0.2);
       }
       setLiveMin(45); setProgress(48);
       scoreRef.current = { h: hs, a: as };
@@ -216,7 +229,7 @@ export default function LiveOverlay({
       animatingRef.current = false;
       onHalftimeReady();
     })();
-  }, [phase, seg1, speed, sleepOrPause, onHalftimeReady]);
+  }, [phase, seg1, speed, sleepOrPause, pauseFor, onHalftimeReady]);
 
   // ── Animação 2º tempo ──
   useEffect(() => {
@@ -240,7 +253,7 @@ export default function LiveOverlay({
           const ev = queue.shift()!;
           if (ev.type === 'goal') { if (ev.team === 'home') hs++; else as++; setLiveScore({ h: hs, a: as }); }
           setLiveEvents((prev) => [...prev, ev]);
-          await sleepOrPause(speed * 0.35);
+          await sleepOrPause(pauseFor(ev));
         }
         await sleepOrPause(speed * 0.6);
       }
@@ -248,14 +261,14 @@ export default function LiveOverlay({
         const ev = queue.shift()!;
         if (ev.type === 'goal') { if (ev.team === 'home') hs++; else as++; setLiveScore({ h: hs, a: as }); }
         setLiveEvents((prev) => [...prev, ev]);
-        await sleepOrPause(speed * 0.2);
+        await sleepOrPause(speed === 2200 ? pauseFor(ev) : speed * 0.2);
       }
       setLiveMin(94); setProgress(100);
       await sleepOrPause(speed * 0.5);
       animatingRef.current = false;
       onLiveComplete();
     })();
-  }, [phase, seg2, speed, sleepOrPause, onLiveComplete]);
+  }, [phase, seg2, speed, sleepOrPause, pauseFor, onLiveComplete]);
 
   // ── Auto-scroll feed ──
   useEffect(() => {
@@ -439,8 +452,12 @@ export default function LiveOverlay({
           <div className="border-b border-[var(--border)] bg-[var(--card)] px-4 pb-4 pt-4 sm:px-5 sm:pt-5">
             <div className="flex items-center gap-1.5 sm:gap-2">
               <div className="flex flex-1 flex-col items-center gap-1.5 sm:gap-2">
-                <TeamLogo logo={home.logo} fallback={home.c} size={40} className="sm:hidden" />
-                <TeamLogo logo={home.logo} fallback={home.c} size={56} className="hidden sm:block" />
+                {homeId === MY_TEAM_ID
+                  ? <ShieldSvg config={shieldConfig} short={home.short} size={46} />
+                  : <>
+                      <TeamLogo logo={home.logo} fallback={home.c} size={40} className="sm:hidden" />
+                      <TeamLogo logo={home.logo} fallback={home.c} size={56} className="hidden sm:block" />
+                    </>}
                 <div className={`font-condensed text-xs font-extrabold uppercase leading-tight text-center sm:text-base ${homeId === MY_TEAM_ID ? 'text-[var(--green-light)]' : 'text-[var(--text)]'}`}>
                   <span className="sm:hidden">{home.short}</span>
                   <span className="hidden sm:inline">{home.name}</span>
@@ -455,8 +472,12 @@ export default function LiveOverlay({
                 </div>
               </div>
               <div className="flex flex-1 flex-col items-center gap-1.5 sm:gap-2">
-                <TeamLogo logo={away.logo} fallback={away.c} size={40} className="sm:hidden" />
-                <TeamLogo logo={away.logo} fallback={away.c} size={56} className="hidden sm:block" />
+                {awayId === MY_TEAM_ID
+                  ? <ShieldSvg config={shieldConfig} short={away.short} size={46} />
+                  : <>
+                      <TeamLogo logo={away.logo} fallback={away.c} size={40} className="sm:hidden" />
+                      <TeamLogo logo={away.logo} fallback={away.c} size={56} className="hidden sm:block" />
+                    </>}
                 <div className={`font-condensed text-xs font-extrabold uppercase leading-tight text-center sm:text-base ${awayId === MY_TEAM_ID ? 'text-[var(--green-light)]' : 'text-[var(--text)]'}`}>
                   <span className="sm:hidden">{away.short}</span>
                   <span className="hidden sm:inline">{away.name}</span>
@@ -623,7 +644,7 @@ export default function LiveOverlay({
                     <span className="text-base leading-none">
                       {ev.type === 'goal' ? '⚽' : ev.type === 'yellow' ? '🟨'
                         : ev.type === 'red' ? '🟥' : ev.type === 'save' ? '🧤'
-                        : ev.type === 'post' ? '🏛️' : '🔄'}
+                        : ev.type === 'post' ? '🥅' : '🔄'}
                     </span>
                     <span className="flex-1 text-[var(--text)]">
                       {ev.type === 'red' ? `Expulso — ${shn(ev.player)} (${ev.tshort})`
@@ -895,7 +916,7 @@ export default function LiveOverlay({
         {/* ══════════════ TABELA LATERAL (post) ══════════════ */}
         {showStandings && (
           <div className="max-h-[50vh] w-full border-t border-[var(--border)] sm:max-h-[70vh] lg:max-h-none lg:w-[340px] lg:border-l lg:border-t-0">
-            <OverlayStandings standings={standings} />
+            <OverlayStandings standings={standings} shieldConfig={shieldConfig} />
           </div>
         )}
       </div>
@@ -994,7 +1015,7 @@ function LiveEventRow({ ev, homeId, awayId }: { ev: MatchEvent; homeId: number; 
     icon = '🧤'; txt = `Defesa de ${shn(ev.player)} (${ev.tshort})`;
   } else if (ev.type === 'post') {
     cls += ' bg-[rgba(255,165,0,0.10)]';
-    icon = '🏛️'; txt = `Na trave! ${shn(ev.player)} (${ev.tshort})`;
+    icon = '🥅'; txt = `Na trave! ${shn(ev.player)} (${ev.tshort})`;
   } else if (ev.type === 'sub') {
     cls += ' bg-[rgba(100,160,255,0.10)]';
     icon = '🔄'; txt = formatSubText(ev);

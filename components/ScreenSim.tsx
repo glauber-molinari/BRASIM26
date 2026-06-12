@@ -4,9 +4,10 @@ import { MY_TEAM_ID, MY_TEAM_EMOJI, PLAYER_PHOTO_MAP } from '@/data/teams';
 import { getTeamDisplay } from '@/lib/simulator';
 import { shn } from '@/lib/helpers';
 import { getPlayerPhoto } from '@/data/playerPhotos';
-import type { LineupSlot, SimSpeed, StoredMatch } from '@/lib/types';
+import type { LineupSlot, ShieldConfig, SimSpeed, StoredMatch } from '@/lib/types';
 import StandingsTable from './StandingsTable';
 import TeamLogo from './TeamLogo';
+import ShieldSvg from './ShieldSvg';
 import SchedulePanel from './SchedulePanel';
 import type { Standing } from '@/lib/types';
 
@@ -20,6 +21,7 @@ interface ScreenSimProps {
   speed: SimSpeed;
   running: boolean;
   pendingLive: boolean;
+  shieldConfig: ShieldConfig;
   onSpeedChange: (s: SimSpeed) => void;
   onStart: () => void;
   onBack: () => void;
@@ -37,6 +39,7 @@ export default function ScreenSim({
   speed,
   running,
   pendingLive,
+  shieldConfig,
   onSpeedChange,
   onStart,
   onBack,
@@ -65,7 +68,10 @@ export default function ScreenSim({
       <div className="mb-4 flex flex-wrap items-center gap-2 sm:gap-3">
         <div>
           <h2 className="section-title">BRA26</h2>
-          <p className="section-sub">38 rodadas · Meu Time {MY_TEAM_EMOJI}</p>
+          <p className="section-sub flex items-center gap-1.5">
+            38 rodadas · Meu Time
+            <span className="inline-flex items-center"><ShieldSvg config={shieldConfig} size={14} /></span>
+          </p>
         </div>
         <div className="ml-auto flex flex-wrap items-center gap-2 sm:gap-3">
           <label className="hidden sm:inline text-sm text-[var(--text2)]">Velocidade</label>
@@ -129,7 +135,9 @@ export default function ScreenSim({
               >
                 <div className="flex items-center gap-2">
                   <div className="flex flex-1 flex-col items-end text-right">
-                    <TeamLogo logo={home.logo} fallback={home.c} size={32} />
+                    {homeId === MY_TEAM_ID
+                      ? <ShieldSvg config={shieldConfig} short={home.short} size={28} />
+                      : <TeamLogo logo={home.logo} fallback={home.c} size={32} />}
                     <div
                       className={`font-condensed text-base font-extrabold uppercase ${
                         homeId === MY_TEAM_ID ? 'text-[var(--green-light)]' : 'text-[var(--text)]'
@@ -153,7 +161,9 @@ export default function ScreenSim({
                     </div>
                   </div>
                   <div className="flex flex-1 flex-col items-start text-left">
-                    <TeamLogo logo={away.logo} fallback={away.c} size={32} />
+                    {awayId === MY_TEAM_ID
+                      ? <ShieldSvg config={shieldConfig} short={away.short} size={28} />
+                      : <TeamLogo logo={away.logo} fallback={away.c} size={32} />}
                     <div
                       className={`font-condensed text-base font-extrabold uppercase ${
                         awayId === MY_TEAM_ID ? 'text-[var(--green-light)]' : 'text-[var(--text)]'
@@ -201,7 +211,7 @@ export default function ScreenSim({
           </div>
           <div className="panel mb-3">
             <div className="panel-title">Classificação</div>
-            <StandingsTable standings={standings} compact aroundMyTeam />
+            <StandingsTable standings={standings} compact aroundMyTeam shieldConfig={shieldConfig} />
           </div>
           <SchedulePanel
             schedule={schedule}
