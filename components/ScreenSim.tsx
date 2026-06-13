@@ -177,7 +177,7 @@ export default function ScreenSim({
                   <div className="mt-1.5 text-sm leading-relaxed text-[var(--text2)]">
                     {res.evs
                       .filter((e) => e.type === 'goal')
-                      .map((e) => `${e.min}' ⚽ ${shn(e.player)} (${e.tshort})`)
+                      .map((e) => `${e.min > 90 ? `90+${e.min - 90}` : e.min}' ⚽ ${shn(e.player)} (${e.tshort})`)
                       .join(' · ')}
                   </div>
                 )}

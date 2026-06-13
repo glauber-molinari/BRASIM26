@@ -22,11 +22,67 @@ import OverlayStandings from './OverlayStandings';
 import TeamLogo from './TeamLogo';
 import ShieldSvg from './ShieldSvg';
 
-const LIVE_MINUTES_1 = [10, 20, 30, 40, 45];
-const LIVE_MINUTES_2 = [55, 65, 75, 85, 90, 91, 92, 93, 94];
+const LIVE_MINUTES_1 = [4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 45];
+const LIVE_MINUTES_2 = [50, 54, 58, 62, 66, 70, 74, 78, 82, 86, 90, 92, 94];
 
 // Modo do painel lateral
 type SideMode = 'default' | 'subOut' | 'subIn';
+
+/** Minutos de acréscimo exibidos como "90+x" (padrão broadcast) */
+function fmtMin(min: number): string {
+  return min > 90 ? `90+${min - 90}` : `${min}`;
+}
+
+interface LiveStatsSnapshot {
+  hShots: number;
+  aShots: number;
+  hSot: number;
+  aSot: number;
+  hCorners: number;
+  aCorners: number;
+  hSaves: number;
+  aSaves: number;
+  hPoss: number;
+}
+
+const EMPTY_STATS: LiveStatsSnapshot = {
+  hShots: 0, aShots: 0, hSot: 0, aSot: 0,
+  hCorners: 0, aCorners: 0, hSaves: 0, aSaves: 0, hPoss: 50,
+};
+
+// Stats num dado minuto, derivadas das timelines do motor — sempre coerentes
+// com os lances exibidos (chutes ≥ no gol ≥ gols; defesas = no gol − gols).
+function computeStats(
+  min: number,
+  seg1: MatchSegment | null,
+  seg2: MatchSegment | null,
+): LiveStatsSnapshot {
+  const count = (arr?: number[]) => (arr ? arr.filter((m) => m <= min).length : 0);
+  const goals = (seg: MatchSegment | null, team: 'home' | 'away') =>
+    seg ? seg.evs.filter((e) => e.type === 'goal' && e.team === team && e.min <= min).length : 0;
+
+  const hSot = count(seg1?.hSotMins) + count(seg2?.hSotMins);
+  const aSot = count(seg1?.aSotMins) + count(seg2?.aSotMins);
+  const hGoals = goals(seg1, 'home') + goals(seg2, 'home');
+  const aGoals = goals(seg1, 'away') + goals(seg2, 'away');
+
+  let hPoss = 50;
+  for (const s of [...(seg1?.possTimeline ?? []), ...(seg2?.possTimeline ?? [])]) {
+    if (s.min <= min) hPoss = s.h;
+  }
+
+  return {
+    hShots: count(seg1?.hShotMins) + count(seg2?.hShotMins),
+    aShots: count(seg1?.aShotMins) + count(seg2?.aShotMins),
+    hSot,
+    aSot,
+    hCorners: count(seg1?.hCornerMins) + count(seg2?.hCornerMins),
+    aCorners: count(seg1?.aCornerMins) + count(seg2?.aCornerMins),
+    hSaves: Math.max(0, aSot - aGoals),
+    aSaves: Math.max(0, hSot - hGoals),
+    hPoss,
+  };
+}
 
 interface LiveOverlayProps {
   visible: boolean;
@@ -98,7 +154,7 @@ export default function LiveOverlay({
   const [liveEvents, setLiveEvents] = useState<MatchEvent[]>([]);
   const [progress, setProgress] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const [liveStats, setLiveStats] = useState({ hShots: 0, aShots: 0, hPoss: 50, saves: 0 });
+  const [liveStats, setLiveStats] = useState<LiveStatsSnapshot>(EMPTY_STATS);
 
   // ── Painel lateral ──
   const [sideMode, setSideMode] = useState<SideMode>('default');
@@ -135,7 +191,7 @@ export default function LiveOverlay({
       setLiveEvents([]);
       setProgress(0);
       setIsPaused(false);
-      setLiveStats({ hShots: 0, aShots: 0, hPoss: 50, saves: 0 });
+      setLiveStats(EMPTY_STATS);
       animatingRef.current = false;
       pausedRef.current = false;
       resumeRef.current = null;
@@ -175,8 +231,11 @@ export default function LiveOverlay({
   // respeita a duração da coreografia da bola para a animação acompanhar.
   const pauseFor = useCallback((ev: MatchEvent) => {
     if (speed !== 2200) return speed * 0.35;
-    if (ev.type === 'goal') return speed * 2.0;
-    if (ev.type === 'save' || ev.type === 'post') return speed * 0.9;
+    if (ev.type === 'goal') return speed * (ev.pen || ev.goalKind === 'counter' || ev.goalKind === 'freekick' ? 2.6 : 2.2);
+    if (ev.type === 'var') return speed * 2.6;
+    if (ev.type === 'save' || ev.type === 'miss') return speed * (ev.pen ? 2.2 : 1.0);
+    if (ev.type === 'post') return speed * 0.95;
+    if (ev.type === 'corner') return speed * 0.85;
     return speed * 0.6;
   }, [speed]);
 
@@ -202,20 +261,14 @@ export default function LiveOverlay({
       for (const min of LIVE_MINUTES_1) {
         setLiveMin(min);
         setProgress(Math.min(48, (min / 45) * 48));
-        const frac = min / 45;
-        setLiveStats({
-          hShots: Math.round(seg1.hShots * frac),
-          aShots: Math.round(seg1.aShots * frac),
-          hPoss: seg1.hPoss,
-          saves: seg1.evs.filter((e) => e.type === 'save' && e.min <= min).length,
-        });
+        setLiveStats(computeStats(min, seg1, null));
         while (queue.length && queue[0].min <= min) {
           const ev = queue.shift()!;
           if (ev.type === 'goal') { if (ev.team === 'home') hs++; else as++; setLiveScore({ h: hs, a: as }); }
           setLiveEvents((prev) => [...prev, ev]);
           await sleepOrPause(pauseFor(ev));
         }
-        await sleepOrPause(speed * 0.6);
+        await sleepOrPause(speed * 0.32);
       }
       while (queue.length) {
         const ev = queue.shift()!;
@@ -224,6 +277,7 @@ export default function LiveOverlay({
         await sleepOrPause(speed === 2200 ? pauseFor(ev) : speed * 0.2);
       }
       setLiveMin(45); setProgress(48);
+      setLiveStats(computeStats(45, seg1, null));
       scoreRef.current = { h: hs, a: as };
       await sleepOrPause(speed * 0.4);
       animatingRef.current = false;
@@ -242,20 +296,14 @@ export default function LiveOverlay({
       for (const min of LIVE_MINUTES_2) {
         setLiveMin(min);
         setProgress(50 + Math.min(50, ((min - 46) / 48) * 50));
-        const frac = (min - 46) / 48;
-        setLiveStats((prev) => ({
-          hShots: prev.hShots + Math.round(seg2.hShots * frac * 0.2),
-          aShots: prev.aShots + Math.round(seg2.aShots * frac * 0.2),
-          hPoss: Math.round((prev.hPoss + seg2.hPoss) / 2),
-          saves: prev.saves + seg2.evs.filter((e) => e.type === 'save' && e.min <= min).length,
-        }));
+        setLiveStats(computeStats(min, seg1, seg2));
         while (queue.length && queue[0].min <= min) {
           const ev = queue.shift()!;
           if (ev.type === 'goal') { if (ev.team === 'home') hs++; else as++; setLiveScore({ h: hs, a: as }); }
           setLiveEvents((prev) => [...prev, ev]);
           await sleepOrPause(pauseFor(ev));
         }
-        await sleepOrPause(speed * 0.6);
+        await sleepOrPause(speed * 0.32);
       }
       while (queue.length) {
         const ev = queue.shift()!;
@@ -264,11 +312,12 @@ export default function LiveOverlay({
         await sleepOrPause(speed === 2200 ? pauseFor(ev) : speed * 0.2);
       }
       setLiveMin(94); setProgress(100);
+      setLiveStats(computeStats(94, seg1, seg2));
       await sleepOrPause(speed * 0.5);
       animatingRef.current = false;
       onLiveComplete();
     })();
-  }, [phase, seg2, speed, sleepOrPause, pauseFor, onLiveComplete]);
+  }, [phase, seg1, seg2, speed, sleepOrPause, pauseFor, onLiveComplete]);
 
   // ── Auto-scroll feed ──
   useEffect(() => {
@@ -338,12 +387,12 @@ export default function LiveOverlay({
   };
   const outcome = getOutcome();
 
-  const timelineScore = (ev: MatchEvent, idx: number) => {
+  const timelineScore = (ev: MatchEvent) => {
     if (ev.type !== 'goal' || !result) return null;
     let h = 0; let a = 0;
-    for (let i = 0; i <= idx; i++) {
-      const e = result.evs[i];
+    for (const e of result.evs) {
       if (e.type === 'goal') { if (e.team === 'home') h++; else a++; }
+      if (e === ev) break;
     }
     return `${h} – ${a}`;
   };
@@ -357,8 +406,22 @@ export default function LiveOverlay({
     if (phase === 'pre') return 'EM BREVE';
     if (phase === 'halftime') return 'INT';
     if (phase === 'post') return 'FT';
-    return `${liveMin}'`;
+    return `${fmtMin(liveMin)}'`;
   };
+
+  const finalStats: LiveStatsSnapshot = result
+    ? {
+        hShots: result.hShots,
+        aShots: result.aShots,
+        hSot: result.hSot ?? 0,
+        aSot: result.aSot ?? 0,
+        hCorners: result.hCorners ?? 0,
+        aCorners: result.aCorners ?? 0,
+        hSaves: Math.max(0, (result.aSot ?? 0) - result.aG),
+        aSaves: Math.max(0, (result.hSot ?? 0) - result.hG),
+        hPoss: result.hPoss,
+      }
+    : EMPTY_STATS;
 
   const TACTICS = ['4-4-2', '4-3-3', '4-5-1', '3-5-2', '5-3-2'] as const;
   const STYLES = [
@@ -526,31 +589,24 @@ export default function LiveOverlay({
                   ref={evsRef}
                   className="flex h-[160px] flex-col gap-1 overflow-y-auto bg-[var(--bg)] px-4 py-3 sm:h-[200px] sm:px-5"
                 >
-                  {liveEvents.map((ev, i) => (
+                  {liveEvents.filter((e) => e.type !== 'corner').map((ev, i) => (
                     <LiveEventRow key={i} ev={ev} homeId={homeId} awayId={awayId} />
                   ))}
                 </div>
               )}
 
-              {/* Stats em tempo real */}
-              <div className="grid grid-cols-4 gap-1.5 border-t border-[var(--border)] px-4 py-2">
-                {[
-                  { val: liveStats.hShots, label: 'Chutes MEU' },
-                  { val: `${liveStats.hPoss}%`, label: 'Posse MEU' },
-                  { val: liveStats.aShots, label: 'Chutes ADV' },
-                  { val: liveStats.saves, label: 'Defesas' },
-                ].map(({ val, label }) => (
-                  <div key={label} className="rounded-lg bg-[var(--bg3)] p-2 text-center">
-                    <div className="font-condensed text-lg font-bold text-[var(--text)]">{val}</div>
-                    <div className="text-[9px] uppercase tracking-wide text-[var(--text3)]">{label}</div>
-                  </div>
-                ))}
-              </div>
+              {/* Stats em tempo real — estilo broadcast */}
+              <StatsPanel
+                stats={liveStats}
+                homeShort={home.short}
+                awayShort={away.short}
+                className="border-t border-[var(--border)] px-4 py-2.5 sm:px-5"
+              />
 
               {/* Barra de progresso */}
               <div className="border-t border-[var(--border)] px-5 py-3">
                 <div className="mb-1.5 flex justify-between text-xs text-[var(--text3)]">
-                  <span>{liveMin}&apos;</span>
+                  <span>{fmtMin(liveMin)}&apos;</span>
                   <span className="font-bold text-[var(--text2)]">
                     {liveMin <= 45 ? '1º Tempo' : '2º Tempo'}
                   </span>
@@ -633,47 +689,32 @@ export default function LiveOverlay({
               </div>
 
               <div className="mb-4 max-h-[180px] overflow-y-auto rounded-lg bg-[var(--bg)] p-3">
-                {result.evs.map((ev, i) => (
-                  <div key={i} className="mb-1.5 flex items-center gap-2.5 text-sm text-[var(--text2)]">
-                    <span className="min-w-[32px] rounded-md bg-[var(--bg3)] px-1.5 py-0.5 text-center text-xs font-bold text-[var(--text)]">
-                      {ev.min}&apos;
-                    </span>
-                    {(ev.type === 'goal' || ev.type === 'yellow' || ev.type === 'red') && (
-                      <PlayerAvatar name={ev.player} />
-                    )}
-                    <span className="text-base leading-none">
-                      {ev.type === 'goal' ? '⚽' : ev.type === 'yellow' ? '🟨'
-                        : ev.type === 'red' ? '🟥' : ev.type === 'save' ? '🧤'
-                        : ev.type === 'post' ? '🥅' : '🔄'}
-                    </span>
-                    <span className="flex-1 text-[var(--text)]">
-                      {ev.type === 'red' ? `Expulso — ${shn(ev.player)} (${ev.tshort})`
-                        : ev.type === 'save' ? `Defesa de ${shn(ev.player)} (${ev.tshort})`
-                        : ev.type === 'post' ? `Na trave! ${shn(ev.player)} (${ev.tshort})`
-                        : ev.type === 'sub' ? formatSubText(ev)
-                        : `${shn(ev.player)} (${ev.tshort})`}
-                    </span>
-                    {ev.type === 'goal' && (
-                      <span className="font-bold text-[var(--text)]">{timelineScore(ev, i)}</span>
-                    )}
-                  </div>
-                ))}
+                {result.evs.filter((e) => e.type !== 'corner').map((ev, i) => {
+                  const d = describeEvent(ev);
+                  return (
+                    <div key={i} className="mb-1.5 flex items-center gap-2.5 text-sm text-[var(--text2)]">
+                      <span className="min-w-[38px] rounded-md bg-[var(--bg3)] px-1.5 py-0.5 text-center text-xs font-bold text-[var(--text)]">
+                        {fmtMin(ev.min)}&apos;
+                      </span>
+                      {(ev.type === 'goal' || ev.type === 'yellow' || ev.type === 'red') && (
+                        <PlayerAvatar name={ev.player} />
+                      )}
+                      <span className="text-base leading-none">{d.icon}</span>
+                      <span className="flex-1 text-[var(--text)]">{d.txt}</span>
+                      {ev.type === 'goal' && (
+                        <span className="font-bold text-[var(--text)]">{timelineScore(ev)}</span>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
 
-              <div className="mb-5 grid grid-cols-3 gap-2.5 text-center text-xs text-[var(--text2)]">
-                <div className="rounded-lg bg-[var(--bg3)] p-3">
-                  <div className="text-lg font-bold text-[var(--text)]">{result.hShots}</div>
-                  Chutes a gol
-                </div>
-                <div className="rounded-lg bg-[var(--bg3)] p-3">
-                  <div className="text-lg font-bold text-[var(--text)]">{result.hPoss}%</div>
-                  Posse de bola
-                </div>
-                <div className="rounded-lg bg-[var(--bg3)] p-3">
-                  <div className="text-lg font-bold text-[var(--text)]">{result.aShots}</div>
-                  Chutes adversário
-                </div>
-              </div>
+              <StatsPanel
+                stats={finalStats}
+                homeShort={home.short}
+                awayShort={away.short}
+                className="mb-5 rounded-lg bg-[var(--bg3)] px-3 py-2.5"
+              />
 
               {roundMatches.length > 0 && (
                 <div className="mb-5">
@@ -733,7 +774,7 @@ export default function LiveOverlay({
                   Nenhum evento ainda
                 </div>
               ) : (
-                liveEvents.map((ev, i) => (
+                liveEvents.filter((e) => e.type !== 'corner').map((ev, i) => (
                   <LiveEventRow key={i} ev={ev} homeId={homeId} awayId={awayId} />
                 ))
               )}
@@ -844,19 +885,12 @@ export default function LiveOverlay({
               {sideMode === 'default' && phase === 'halftime' && (
                 <>
                   {/* Stats do 1º tempo */}
-                  <div className="grid grid-cols-2 gap-2 border-b border-[var(--border)] p-3">
-                    {[
-                      { val: liveStats.hShots, label: 'Chutes MEU' },
-                      { val: `${liveStats.hPoss}%`, label: 'Posse MEU' },
-                      { val: liveStats.aShots, label: 'Chutes ADV' },
-                      { val: liveStats.saves, label: 'Defesas' },
-                    ].map(({ val, label }) => (
-                      <div key={label} className="rounded-lg bg-[var(--bg3)] p-2 text-center">
-                        <div className="font-condensed text-xl font-bold text-[var(--text)]">{val}</div>
-                        <div className="text-[9px] uppercase tracking-wide text-[var(--text3)]">{label}</div>
-                      </div>
-                    ))}
-                  </div>
+                  <StatsPanel
+                    stats={liveStats}
+                    homeShort={home.short}
+                    awayShort={away.short}
+                    className="border-b border-[var(--border)] p-3"
+                  />
 
                   {/* Eventos do 1º tempo */}
                   <div className="flex flex-1 flex-col gap-1 overflow-y-auto bg-[var(--bg)] p-3">
@@ -865,7 +899,7 @@ export default function LiveOverlay({
                         Nenhum evento no 1º tempo
                       </div>
                     ) : (
-                      liveEvents.map((ev, i) => (
+                      liveEvents.filter((e) => e.type !== 'corner').map((ev, i) => (
                         <LiveEventRow key={i} ev={ev} homeId={homeId} awayId={awayId} />
                       ))
                     )}
@@ -932,6 +966,106 @@ function formatSubText(ev: MatchEvent): string {
   return `Substituição — ${out} sai (${ev.tshort})`;
 }
 
+// Narração única do evento — usada no feed ao vivo e na timeline pós-jogo
+function describeEvent(ev: MatchEvent): { icon: string; txt: string } {
+  switch (ev.type) {
+    case 'goal': {
+      const name = shn(ev.player);
+      const base =
+        ev.goalKind === 'pen' ? `Gol de pênalti — ${name}`
+        : ev.goalKind === 'counter' ? `Gol em contra-ataque — ${name}`
+        : ev.goalKind === 'header' ? `Gol de cabeça — ${name}`
+        : ev.goalKind === 'longshot' ? `Golaço de fora da área — ${name}`
+        : ev.goalKind === 'freekick' ? `Gol de falta — ${name}`
+        : name;
+      const assist = ev.assist ? ` · assist. ${shn(ev.assist)}` : '';
+      return { icon: '⚽', txt: `${base} (${ev.tshort})${assist}` };
+    }
+    case 'yellow':
+      return { icon: '🟨', txt: `${shn(ev.player)} (${ev.tshort})` };
+    case 'red':
+      return {
+        icon: '🟥',
+        txt: `${ev.secondYellow ? 'Expulso (2º amarelo)' : 'Expulso'} — ${shn(ev.player)} (${ev.tshort})`,
+      };
+    case 'save':
+      return {
+        icon: '🧤',
+        txt: ev.pen
+          ? `Pênalti defendido por ${shn(ev.player)}! (${ev.tshort})`
+          : `Defesa de ${shn(ev.player)} (${ev.tshort})`,
+      };
+    case 'post':
+      return { icon: '🥅', txt: `Na trave! ${shn(ev.player)} (${ev.tshort})` };
+    case 'miss':
+      return {
+        icon: ev.pen ? '❌' : '💨',
+        txt: ev.pen
+          ? `Pênalti desperdiçado — ${shn(ev.player)} (${ev.tshort})`
+          : `Perdeu chance incrível! ${shn(ev.player)} (${ev.tshort})`,
+      };
+    case 'var':
+      return { icon: '📺', txt: `VAR anula gol de ${shn(ev.player)} (${ev.tshort})` };
+    case 'corner':
+      return { icon: '🚩', txt: `Escanteio (${ev.tshort})` };
+    case 'sub':
+      return { icon: '🔄', txt: formatSubText(ev) };
+  }
+}
+
+// ─── Painel de estatísticas estilo broadcast ─────────────────────────────────
+
+function StatRow({ h, a, label }: { h: number; a: number; label: string }) {
+  return (
+    <div className="flex items-center justify-between gap-2 py-0.5 text-sm">
+      <span className={`min-w-[26px] font-condensed text-base font-bold ${h >= a ? 'text-[var(--text)]' : 'text-[var(--text3)]'}`}>
+        {h}
+      </span>
+      <span className="text-[10px] uppercase tracking-wide text-[var(--text3)]">{label}</span>
+      <span className={`min-w-[26px] text-right font-condensed text-base font-bold ${a >= h ? 'text-[var(--text)]' : 'text-[var(--text3)]'}`}>
+        {a}
+      </span>
+    </div>
+  );
+}
+
+function StatsPanel({
+  stats,
+  homeShort,
+  awayShort,
+  className,
+}: {
+  stats: LiveStatsSnapshot;
+  homeShort: string;
+  awayShort: string;
+  className?: string;
+}) {
+  return (
+    <div className={className}>
+      <div className="mb-1 flex justify-between text-[10px] font-bold uppercase tracking-wide text-[var(--text2)]">
+        <span>{homeShort} {stats.hPoss}%</span>
+        <span className="text-[var(--text3)]">Posse de bola</span>
+        <span>{100 - stats.hPoss}% {awayShort}</span>
+      </div>
+      <div className="mb-2 flex h-1.5 gap-px overflow-hidden rounded-full bg-[var(--bg3)]">
+        <div
+          className="rounded-l-full bg-[var(--green-light)] transition-all duration-700"
+          style={{ width: `${stats.hPoss}%` }}
+        />
+        <div
+          className="flex-1 rounded-r-full bg-[var(--red)]/60 transition-all duration-700"
+        />
+      </div>
+      <div className="grid grid-cols-2 gap-x-6">
+        <StatRow h={stats.hShots} a={stats.aShots} label="Finalizações" />
+        <StatRow h={stats.hSot} a={stats.aSot} label="No gol" />
+        <StatRow h={stats.hCorners} a={stats.aCorners} label="Escanteios" />
+        <StatRow h={stats.hSaves} a={stats.aSaves} label="Defesas" />
+      </div>
+    </div>
+  );
+}
+
 // ─── Sub-componentes ──────────────────────────────────────────────────────────
 
 function TacticPanel({
@@ -994,37 +1128,31 @@ function PlayerAvatar({ name }: { name: string }) {
   );
 }
 
+const EVENT_BG: Record<MatchEvent['type'], string> = {
+  goal: '',  // depende de quem marcou
+  yellow: ' bg-[rgba(255,202,40,0.15)]',
+  red: ' bg-[rgba(255,82,82,0.18)]',
+  save: ' bg-[rgba(255,255,255,0.06)]',
+  post: ' bg-[rgba(255,165,0,0.10)]',
+  miss: ' bg-[rgba(255,140,60,0.10)]',
+  var: ' bg-[rgba(186,104,200,0.14)]',
+  corner: ' bg-[rgba(255,255,255,0.04)]',
+  sub: ' bg-[rgba(100,160,255,0.10)]',
+};
+
 function LiveEventRow({ ev, homeId, awayId }: { ev: MatchEvent; homeId: number; awayId: number }) {
   const isMy = (ev.team === 'home' && homeId === MY_TEAM_ID) || (ev.team === 'away' && awayId === MY_TEAM_ID);
 
   let cls = 'ev-slide flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm';
-  let icon = '';
-  let txt = '';
+  cls += ev.type === 'goal'
+    ? isMy ? ' bg-[rgba(31,196,94,0.2)]' : ' bg-[rgba(255,82,82,0.15)]'
+    : EVENT_BG[ev.type];
 
-  if (ev.type === 'goal') {
-    cls += isMy ? ' bg-[rgba(31,196,94,0.2)]' : ' bg-[rgba(255,82,82,0.15)]';
-    icon = '⚽'; txt = `${shn(ev.player)} (${ev.tshort})`;
-  } else if (ev.type === 'yellow') {
-    cls += ' bg-[rgba(255,202,40,0.15)]';
-    icon = '🟨'; txt = `${shn(ev.player)} (${ev.tshort})`;
-  } else if (ev.type === 'red') {
-    cls += ' bg-[rgba(255,82,82,0.18)]';
-    icon = '🟥'; txt = `Expulso — ${shn(ev.player)} (${ev.tshort})`;
-  } else if (ev.type === 'save') {
-    cls += ' bg-[rgba(255,255,255,0.06)]';
-    icon = '🧤'; txt = `Defesa de ${shn(ev.player)} (${ev.tshort})`;
-  } else if (ev.type === 'post') {
-    cls += ' bg-[rgba(255,165,0,0.10)]';
-    icon = '🥅'; txt = `Na trave! ${shn(ev.player)} (${ev.tshort})`;
-  } else if (ev.type === 'sub') {
-    cls += ' bg-[rgba(100,160,255,0.10)]';
-    icon = '🔄'; txt = formatSubText(ev);
-  }
-
+  const { icon, txt } = describeEvent(ev);
   const showAvatar = ev.type === 'goal' || ev.type === 'yellow' || ev.type === 'red';
   return (
     <div className={cls}>
-      <span className="min-w-[30px] text-sm font-bold text-[var(--text2)]">{ev.min}&apos;</span>
+      <span className="min-w-[36px] text-sm font-bold text-[var(--text2)]">{fmtMin(ev.min)}&apos;</span>
       {showAvatar && <PlayerAvatar name={ev.player} />}
       <span className="min-w-5 text-base leading-none">{icon}</span>
       <span className="text-[var(--text)]">{txt}</span>

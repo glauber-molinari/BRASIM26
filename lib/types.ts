@@ -31,14 +31,27 @@ export interface LineupSlot {
   player: SelectedPlayer | null;
 }
 
+/** Tipo de jogada que originou o gol — muda narração e coreografia no campinho */
+export type GoalKind = 'normal' | 'header' | 'longshot' | 'counter' | 'freekick' | 'pen';
+
 export interface MatchEvent {
   min: number;
-  type: 'goal' | 'yellow' | 'red' | 'save' | 'post' | 'sub';
+  type: 'goal' | 'yellow' | 'red' | 'save' | 'post' | 'sub' | 'miss' | 'corner' | 'var';
   team: 'home' | 'away';
   player: string;      // jogador que sai (em subs)
   playerIn?: string;   // jogador que entra (em subs)
+  assist?: string;     // garçom (em gols de jogada)
+  goalKind?: GoalKind;
+  pen?: boolean;       // lance de pênalti (em save/miss = pênalti desperdiçado)
+  secondYellow?: boolean; // expulsão por 2º amarelo
   tshort: string;
   isMy: boolean;
+}
+
+/** Amostra de posse ao longo do tempo — permite posse "viva" no placar */
+export interface PossSample {
+  min: number;
+  h: number;
 }
 
 export interface MatchSegment {
@@ -48,6 +61,14 @@ export interface MatchSegment {
   hShots: number;
   aShots: number;
   hPoss: number;
+  /** Minutos de cada finalização — stats ao vivo 100% coerentes com os lances */
+  hShotMins?: number[];
+  aShotMins?: number[];
+  hSotMins?: number[];
+  aSotMins?: number[];
+  hCornerMins?: number[];
+  aCornerMins?: number[];
+  possTimeline?: PossSample[];
 }
 
 export interface MatchResult {
@@ -59,6 +80,21 @@ export interface MatchResult {
   hShots: number;
   aShots: number;
   hPoss: number;
+  hSot?: number;
+  aSot?: number;
+  hCorners?: number;
+  aCorners?: number;
+}
+
+/** Estado herdado do tempo anterior — placar e expulsões moldam o 2º tempo */
+export interface SegCarry {
+  hG: number;
+  aG: number;
+  hRed: number;
+  aRed: number;
+  hPoss?: number;
+  /** "TIME:Jogador" já amarelados — risco de 2º amarelo no tempo seguinte */
+  booked?: string[];
 }
 
 export interface Standing {

@@ -9,6 +9,7 @@ import {
   simMatch,
   simMatchSegment,
   buildMatchResult,
+  carryFromSegment,
   updateStandings,
   getTeamDisplay,
   setMyTeam,
@@ -169,9 +170,11 @@ export default function Home() {
     setLivePhase('halftime');
   }, []);
 
-  // Usuário clica "Iniciar 2º Tempo" → gera 2º tempo com lineup/estilo atual
+  // Usuário clica "Iniciar 2º Tempo" → gera 2º tempo com lineup/estilo atual,
+  // herdando placar, expulsões e amarelados do 1º tempo
   const handleSecondHalfStart = useCallback(() => {
-    const seg2 = simMatchSegment(liveHome, liveAway, lineup, gameStyle, 46, 94);
+    const carry = seg1Ref.current ? carryFromSegment(seg1Ref.current) : undefined;
+    const seg2 = simMatchSegment(liveHome, liveAway, lineup, gameStyle, 46, 94, carry);
     seg2Ref.current = seg2;
     setLiveSeg2(seg2);
     setLivePhase('live2');

@@ -110,6 +110,51 @@ export function pickWeightedCardPlayer(squad: Player[]): Player {
   return weightedPick(squad, getCardWeight);
 }
 
+const ASSIST_POS: Record<string, number> = { GK: 1, DF: 14, MF: 55, FW: 30 };
+
+/** Peso relativo para dar assistência */
+export function getAssistWeight(player: Player): number {
+  const base = ASSIST_POS[player.p] ?? 10;
+  const s = lookupPlayerStats(player.n);
+  if (!s) return base;
+
+  let mult = 1;
+  if (s.assists) mult += Math.min(s.assists * 0.18, 1.2);
+  if (s.keyPassesPg) mult += Math.min(s.keyPassesPg * 0.12, 0.5);
+  if (s.bigChancesCreated) mult += Math.min(s.bigChancesCreated * 0.06, 0.4);
+  if (s.rating) mult *= 0.9 + Math.min(0.3, (s.rating - 6.6) * 0.07);
+
+  return base * Math.max(0.6, Math.min(3, mult));
+}
+
+export function pickWeightedAssister(squad: Player[], scorerName: string): Player | null {
+  const pool = squad.filter((p) => p.n !== scorerName && p.p !== 'GK');
+  if (!pool.length) return null;
+  return weightedPick(pool, getAssistWeight);
+}
+
+/** Cobrador de pênalti: quem já converteu cobranças, senão o melhor finalizador */
+export function pickPenaltyTaker(squad: Player[]): Player {
+  const fallback = squad.find((p) => p.p !== 'GK') ?? squad[0] ?? ({ n: 'Jogador', p: 'FW' } as Player);
+  const candidates = squad.filter((p) => p.p !== 'GK');
+  if (!candidates.length) return fallback;
+
+  const withPens = candidates.filter((p) => {
+    const s = lookupPlayerStats(p.n);
+    return s?.penaltiesScored && s.penaltiesScored > 0;
+  });
+  if (withPens.length) {
+    return withPens.reduce((best, p) => {
+      const bs = lookupPlayerStats(best.n)?.penaltiesScored ?? 0;
+      const ps = lookupPlayerStats(p.n)?.penaltiesScored ?? 0;
+      return ps > bs ? p : best;
+    });
+  }
+  return candidates.reduce((best, p) =>
+    getScorerWeight(p) > getScorerWeight(best) ? p : best
+  );
+}
+
 /** Bônus de força individual (0–8) para compor overall do Meu Time */
 export function getPlayerStrengthBonus(player: Player): number {
   const s = lookupPlayerStats(player.n);
